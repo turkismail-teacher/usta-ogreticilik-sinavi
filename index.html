@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T.C. MEB Usta Öğreticilik (İş Pedagojisi) e-Sınav Simülatörü — 5 Deneme Sınavı &amp; Soru Havuzu</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #F1F5F9;
+      color: #0F172A;
+    }
+    .esinav-header-gradient {
+      background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #1D4ED8 100%);
+    }
+    .esinav-bar {
+      background: linear-gradient(90deg, #1E3A8A 0%, #2563EB 100%);
+    }
+    .opt-card {
+      transition: all 0.15s ease-in-out;
+    }
+    .opt-card:hover {
+      border-color: #3B82F6;
+      background-color: #EFF6FF;
+    }
+    .opt-selected {
+      border-color: #1D4ED8 !important;
+      background-color: #DBEAFE !important;
+      box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+    }
+    .q-grid-btn {
+      transition: all 0.12s ease;
+    }
+    .q-grid-btn:hover {
+      transform: translateY(-1px);
+    }
+    /* Custom scrollbar for question palette */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F1F5F9;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94A3B8;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP NAVIGATION BAR -->
+  <header id="main-navbar" class="esinav-header-gradient text-white shadow-lg sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center border border-white/25 font-extrabold text-lg tracking-tighter">
+          MEB
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-bold text-base sm:text-lg leading-tight">Usta Öğreticilik (İş Pedagojisi) e-Sınav Platformu</h1>
+            <span class="hidden md:inline-block text-xs bg-amber-500/20 text-amber-200 border border-amber-400/30 px-2 py-0.5 rounded-full font-medium">2026 Güncel Müfredat</span>
+          </div>
+          <p class="text-xs text-blue-200">5 Tam Deneme Sınavı • 150 Özgün Soru Havuzu • Çoklu Kullanıcı &amp; Link Paylaşım Destekli</p>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-1.5 sm:gap-2">
+        <button id="nav-btn-home" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-white/15 hover:bg-white/25 transition flex items-center gap-1.5">
+          <span>🏠</span> <span>Deneme Sınavları</span>
+        </button>
+        <button id="nav-btn-pool" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold hover:bg-white/15 transition flex items-center gap-1.5">
+          <span>📚</span> <span>Soru Havuzu (150)</span>
+        </button>
+        <button id="nav-btn-deploy" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 hover:bg-emerald-500/30 transition flex items-center gap-1.5">
+          <span>🚀</span> <span>Ücretsiz Yayınla &amp; Paylaş</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden max-w-sm bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl border border-slate-700 flex items-center gap-3">
+    <span id="toast-icon" class="text-lg">✅</span>
+    <p id="toast-text" class="text-sm font-medium"></p>
+  </div>
+
+  <!-- CONFIRMATION MODAL (Finish Exam / Reset) -->
+  <div id="confirm-modal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">!</div>
+        <h3 id="modal-title" class="text-lg font-bold text-slate-900">Sınavı Bitirmek İstiyor musunuz?</h3>
+      </div>
+      <p id="modal-desc" class="text-sm text-slate-600 mb-5 leading-relaxed"></p>
+      <div class="flex items-center justify-end gap-3">
+        <button id="modal-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition">
+          Sınava Dön
+        </button>
+        <button id="modal-confirm-btn" type="button" class="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-blue-700 hover:bg-blue-800 transition shadow">
+          Sınavı Bitir ve Sonucu Gör
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6">
+
+    <!-- ==================== VIEW 1: DASHBOARD (HOME) ==================== -->
+    <section id="view-home" class="space-y-6">
+
+      <!-- Candidate Welcome & Multi-User Bar -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div class="space-y-1">
+          <div class="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full">
+            <span>●</span> <span>MEB Ölçme, Değerlendirme ve Sınav Hizmetleri (ÖDSGM) e-Sınav Simülasyonu</span>
+          </div>
+          <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Aday Girişi ve Sınav Seçim Ekranı</h2>
+          <p class="text-sm text-slate-600">Adınızı girerek deneme sınavlarına başlayabilirsiniz. Aynı link üzerinden sınırsız sayıda kursiyer kendi cihazında bağımsız olarak çalışabilir ve sonuç karnesini link olarak paylaşabilir.</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div class="flex-1">
+            <label for="candidate-name-input" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Aday Adı Soyadı</label>
+            <input id="candidate-name-input" type="text" placeholder="Örn: Ahmet Yılmaz" class="w-full sm:w-52 px-3 py-1.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:border-blue-600 font-semibold text-slate-800">
+          </div>
+          <div class="flex items-end gap-2">
+            <button id="save-candidate-btn" type="button" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-blue-700 text-white hover:bg-blue-800 transition">
+              Kaydet
+            </button>
+            <button id="share-platform-btn" type="button" class="px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-800 text-white hover:bg-slate-900 transition flex items-center gap-1">
+              <span>🔗</span> <span>Linki Kopyala</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shared Score Banner (Shown when opening a friend's result link) -->
+      <div id="shared-result-banner" class="hidden bg-gradient-to-r from-emerald-900 to-teal-800 text-white rounded-2xl p-5 shadow-md">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs uppercase tracking-wider bg-white/20 px-2.5 py-0.5 rounded-full font-bold">Paylaşılan Sınav Karnesi</span>
+            <h3 id="shared-banner-title" class="text-lg font-extrabold mt-1.5"></h3>
+            <p id="shared-banner-details" class="text-sm text-emerald-100 mt-0.5"></p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="shared-try-same-btn" type="button" class="px-4 py-2 rounded-xl bg-white text-emerald-950 font-bold text-xs sm:text-sm hover:bg-emerald-50 transition">
+              Aynı Denemeyi Sen de Çöz
+            </button>
+            <button id="shared-close-btn" type="button" class="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-xs font-semibold">
+              Kapat
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Exam Rules Summary Cards -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase">Soru Sayısı &amp; Süre</div>
+          <div class="text-lg sm:text-xl font-extrabold text-slate-900 mt-1">50 Soru / 45 Dk</div>
+          <div class="text-xs text-slate-500 mt-0.5">4 seçenekli, tek doğru yanıt</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase">Başarı Barajı</div>
+          <div class="text-lg sm:text-xl font-extrabold text-emerald-700 mt-1">50 Puan (25 Doğru)</div>
+          <div class="text-xs text-slate-500 mt-0.5">Yanlışlar doğruyu götürmez</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase">Tamamlanan Deneme</div>
+          <div id="stat-completed-count" class="text-lg sm:text-xl font-extrabold text-blue-700 mt-1">0 / 6 Sınav</div>
+          <div class="text-xs text-slate-500 mt-0.5">Tarayıcı hafızasında kayıtlı</div>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="text-xs font-bold text-slate-500 uppercase">Ortalama Puanınız</div>
+          <div id="stat-avg-score" class="text-lg sm:text-xl font-extrabold text-amber-600 mt-1">—</div>
+          <div class="text-xs text-slate-500 mt-0.5">Hedef: 70+ güvenli puan</div>
+        </div>
+      </div>
+
+      <!-- 5 Fixed Mock Exams + 1 Dynamic Random Pool Exam Generator -->
+      <div>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-lg font-extrabold text-slate-900">5 Hazır Deneme Sınavı ve Dinamik Soru Havuzu Sınavı</h3>
+            <p class="text-xs sm:text-sm text-slate-600">Gerçek MEB e-Sınav ekranı veya Anında Çözümlü Çalışma Modu ile dilediğiniz denemeyi başlatın.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="inline-flex items-center gap-2 text-xs font-semibold bg-white px-3 py-2 rounded-xl border border-slate-200 cursor-pointer select-none">
+              <input id="instant-feedback-toggle" type="checkbox" class="rounded text-blue-600 focus:ring-blue-500">
+              <span>Anında Çözümü Göster (Eğitim Modu)</span>
+            </label>
+          </div>
+        </div>
+
+        <div id="exams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- 9 Learning Units Quick Reference Accordion / Cards -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900">9 Öğrenme Birimi Kritik Sınav Rakamları (Hızlı Tekrar)</h3>
+            <p class="text-xs text-slate-500">Sınavdan hemen önce mutlaka bilmeniz gereken altın kurallar</p>
+          </div>
+          <button id="go-pool-from-home-btn" type="button" class="text-xs font-bold text-blue-700 hover:text-blue-900 underline text-left">
+            Tüm 150 Soruyu ve Çözümlerini İncele →
+          </button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs leading-relaxed">
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 mb-1">1. Mevzuat (3308 S.K.) &amp; Ahilik</div>
+            <p class="text-slate-700">• Çırağa asgari ücretin <strong>en az %30'u</strong> ödenir (vergiden muaftır).<br>• Tatil aylarında <strong>1 ay ücretli izin</strong> verilir.<br>• Sigorta primini <strong>Devlet (MEB)</strong> öder.<br>• Sözleşme feshi <strong>3 iş günü</strong> içinde bildirilir.<br>• İş yerinde <strong>Usta Öğretici</strong> şarttır (40 saat kurs).<br>• Kalfalıktan sonra <strong>5 yıl</strong> çalışan veya <strong>Seviye 4 MYK</strong> olan doğrudan ustalık sınavına girer.<br>• Ahilik kurucusu <strong>Ahi Evran</strong>, tören <strong>Şed Kuşanma</strong>.</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 mb-1">2. İSG, İletişim &amp; Psikoloji</div>
+            <p class="text-slate-700">• İş kazalarının <strong>%98'i önlenebilir</strong>, <strong>%2'si önlenemez</strong>.<br>• 1. sırada <strong>tehlikeli davranışlar (%88)</strong> yer alır.<br>• Tedavi/tazminat <strong>doğrudan</strong>; iş günü/üretim kaybı <strong>dolaylı</strong> zarardır.<br>• İletişim engelleyici etken <strong>gürültü</strong>dür; <em>plan</em> ve <em>ölçüt</em> iletişim ögesi değildir.<br>• Eğitim ve psikolojinin ortak noktası <strong>insan davranışı</strong>dır.<br>• Erkeklerde ergenlik <strong>13-18 yaş</strong>; çırak ustayı <strong>model alarak</strong> öğrenir.</p>
+          </div>
+          <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="font-bold text-blue-900 mb-1">3. Yöntem, Program, Kalite &amp; Ölçme</div>
+            <p class="text-slate-700">• Beceri öğretiminin 4 basamağı: <strong>Hazırlık, Takdim, Uygulama, Değerlendirme</strong> (<em>Gözetim</em> yoktur).<br>• Kalıcılık yalnız işiterek <strong>%20</strong>, <strong>yaparak-söyleyerek %90</strong>.<br>• Eğitim yılı <strong>36 hafta</strong>, çerçeve program <strong>4 yıl</strong>.<br>• Yıllık planı <strong>okul alan öğretmeni</strong> yapar, planda <strong>sınav soruları bulunmaz</strong>.<br>• İşlenmeyen konuyu sormak <strong>geçerliği</strong> bozar; beceri <strong>performans (iş yapma) testiyle</strong> ölçülür.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: REAL MEB e-SINAV SIMULATOR ==================== -->
+    <section id="view-exam" class="hidden space-y-4">
+
+      <!-- Official-style MEB e-Sınav Top Information Bar -->
+      <div class="esinav-bar text-white rounded-2xl p-4 shadow-md flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-xl bg-white/15 border border-white/25 flex flex-col items-center justify-center leading-none">
+            <span class="text-[10px] uppercase font-bold text-blue-200">SORU</span>
+            <span id="exam-current-q-badge" class="text-lg font-extrabold">1/50</span>
+          </div>
+          <div>
+            <div id="exam-header-title" class="font-extrabold text-sm sm:text-base">1. Deneme Sınavı</div>
+            <div class="text-xs text-blue-100 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span>👤 Aday: <strong id="exam-candidate-display">Misafir Aday</strong></span>
+              <span>📌 Modül: <strong id="exam-unit-display">1. Mesleki Eğitim</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2.5 sm:gap-3">
+          <!-- Countdown Timer -->
+          <div class="bg-slate-900/80 border border-white/20 px-3.5 py-2 rounded-xl flex items-center gap-2">
+            <span class="text-amber-400 text-sm">⏱️</span>
+            <div>
+              <div class="text-[10px] uppercase tracking-wider text-slate-300 leading-none">Kalan Süre</div>
+              <div id="exam-timer-display" class="font-mono font-extrabold text-base sm:text-lg leading-tight text-white">45:00</div>
+            </div>
+          </div>
+
+          <button id="exam-finish-top-btn" type="button" class="px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm shadow transition flex items-center gap-1.5">
+            <span>⏹</span> <span>Sınavı Bitir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Main 2-Column e-Sınav Split Layout -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+        <!-- Left / Center: Question & Options Area (8 cols) -->
+        <div class="lg:col-span-8 bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-6 flex flex-col justify-between min-h-[440px]">
+          <div>
+            <!-- Question Header & Font/Flag Controls -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-slate-200">
+              <div class="flex items-center gap-2">
+                <span id="q-number-pill" class="px-3 py-1 rounded-lg bg-blue-900 text-white font-extrabold text-sm">Soru 1</span>
+                <span id="q-unit-pill" class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-semibold text-xs">1. Mesleki Eğitim</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <button id="flag-question-btn" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-300 text-slate-700 hover:bg-amber-50 transition flex items-center gap-1.5">
+                  <span id="flag-icon">🚩</span> <span id="flag-text">Boş / Sonra Bak İşaretle</span>
+                </button>
+                <button id="clear-answer-btn" type="button" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold border border-slate-200 text-slate-600 hover:bg-slate-100 transition">
+                  Seçimi Temizle
+                </button>
+              </div>
+            </div>
+
+            <!-- Question Stem -->
+            <div id="question-stem-text" class="text-base sm:text-lg font-semibold text-slate-900 leading-relaxed mb-6 select-text">
+              Soru yükleniyor...
+            </div>
+
+            <!-- 4 Options (A, B, C, D) -->
+            <div id="options-container" class="space-y-3">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Instant Explanation Box (Visible in Study Mode or when toggled) -->
+            <div id="instant-exp-box" class="hidden mt-5 p-4 rounded-xl border text-sm leading-relaxed">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Bottom Navigation Buttons (Önceki / Sonraki) -->
+          <div class="flex items-center justify-between gap-3 pt-6 mt-6 border-t border-slate-200">
+            <button id="prev-question-btn" type="button" class="px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-2 disabled:opacity-40">
+              <span>◀</span> <span>Önceki Soru</span>
+            </button>
+
+            <div class="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-medium">
+              <span>Klavye Kısayolları:</span>
+              <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-[11px]">A-D</kbd>
+              <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-[11px]">←</kbd>
+              <kbd class="px-1.5 py-0.5 bg-slate-100 border border-slate-300 rounded text-[11px]">→</kbd>
+            </div>
+
+            <button id="next-question-btn" type="button" class="px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm bg-blue-700 hover:bg-blue-800 text-white shadow transition flex items-center gap-2">
+              <span id="next-btn-label">Sonraki Soru</span> <span>▶</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: 1-50 Question Palette & Status Summary (4 cols) -->
+        <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <h3 class="font-extrabold text-sm text-slate-900">Optik Soru Gezgini (1 – 50)</h3>
+            <span id="palette-answered-count" class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full">0 / 50 Yanıtlandı</span>
+          </div>
+
+          <!-- Legend -->
+          <div class="grid grid-cols-3 gap-2 text-[11px] font-semibold text-slate-600">
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded bg-blue-700 inline-block"></span> <span>Yanıtlandı</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded bg-amber-400 inline-block"></span> <span>Sonra Bak</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-3.5 h-3.5 rounded bg-slate-100 border border-slate-300 inline-block"></span> <span>Boş</span>
+            </div>
+          </div>
+
+          <!-- 50 Buttons Grid -->
+          <div id="question-palette-grid" class="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 max-h-[320px] overflow-y-auto p-1">
+            <!-- Populated by JS -->
+          </div>
+
+          <!-- Quick Filter / Actions -->
+          <div class="pt-2 border-t border-slate-200 flex flex-col gap-2">
+            <button id="jump-first-empty-btn" type="button" class="w-full py-2 px-3 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              İlk Boş Soruya Git
+            </button>
+            <button id="exam-finish-side-btn" type="button" class="w-full py-2.5 px-3 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow transition">
+              ✓ Sınavı Tamamla ve Değerlendir
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: EXAM RESULT & ANALYTICS ==================== -->
+    <section id="view-result" class="hidden space-y-6">
+
+      <!-- Result Hero Card -->
+      <div id="result-hero-card" class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div id="result-status-badge" class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider">
+              <!-- BAŞARILI / BAŞARISIZ -->
+            </div>
+            <h2 id="result-exam-title" class="text-xl sm:text-2xl font-extrabold text-slate-900">Sınav Sonuç Karnesi</h2>
+            <p id="result-candidate-line" class="text-sm text-slate-600"></p>
+          </div>
+
+          <!-- Score Circle / Box -->
+          <div class="flex items-center gap-4">
+            <div class="text-center px-6 py-4 rounded-2xl bg-slate-900 text-white shadow-lg">
+              <div class="text-[11px] uppercase tracking-wider text-slate-300 font-bold">e-Sınav Puanı</div>
+              <div id="result-score-big" class="text-3xl sm:text-4xl font-extrabold text-amber-400 mt-0.5">0</div>
+              <div class="text-[11px] text-slate-300 mt-0.5">Baraj: 50 Puan</div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div class="text-[11px] font-bold text-emerald-700">DOĞRU</div>
+                <div id="result-correct-count" class="text-lg font-extrabold text-emerald-800">0</div>
+              </div>
+              <div class="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                <div class="text-[11px] font-bold text-rose-700">YANLIŞ</div>
+                <div id="result-wrong-count" class="text-lg font-extrabold text-rose-800">0</div>
+              </div>
+              <div class="p-3 rounded-xl bg-slate-100 border border-slate-200">
+                <div class="text-[11px] font-bold text-slate-600">BOŞ</div>
+                <div id="result-empty-count" class="text-lg font-extrabold text-slate-800">0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons on Result Page -->
+        <div class="flex flex-wrap items-center gap-3 mt-6 pt-5 border-t border-slate-200">
+          <button id="share-result-link-btn" type="button" class="px-4 py-2.5 rounded-xl bg-blue-700 hover:bg-blue-800 text-white font-bold text-xs sm:text-sm shadow transition flex items-center gap-2">
+            <span>🔗</span> <span>Sonuç Karnemi Link Olarak Paylaş</span>
+          </button>
+          <button id="retry-current-exam-btn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs sm:text-sm transition">
+            🔄 Bu Sınavı Tekrar Çöz
+          </button>
+          <button id="back-to-home-from-result-btn" type="button" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm transition">
+            🏠 Diğer Deneme Sınavlarına Geç
+          </button>
+        </div>
+      </div>
+
+      <!-- Breakdown by 9 Learning Units -->
+      <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200">
+        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 mb-1">9 Öğrenme Birimine Göre Başarı Analizi</h3>
+        <p class="text-xs text-slate-500 mb-4">Hangi modülde eksiğiniz olduğunu buradan görebilirsiniz</p>
+        <div id="result-unit-breakdown" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <!-- Detailed Question-by-Question Review with Explanations -->
+      <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200">
+          <div>
+            <h3 class="text-base sm:text-lg font-extrabold text-slate-900">Soru ve Açıklamalı Çözüm İncelemesi (1 – 50)</h3>
+            <p class="text-xs text-slate-500">Verdiğiniz yanıtları, doğru şıkları ve mevzuat/pedagoji açıklamalarını inceleyin</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button id="filter-review-all" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-700 text-white">Tümü (50)</button>
+            <button id="filter-review-wrong" type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200">Sadece Yanlış &amp; Boşlar</button>
+          </div>
+        </div>
+
+        <div id="result-questions-review-list" class="space-y-4">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: QUESTION POOL BROWSER (150 QUESTIONS) ==================== -->
+    <section id="view-pool" class="hidden space-y-5">
+      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-extrabold text-slate-900">MEB İş Pedagojisi 150 Soruluk Tam Soru Havuzu ve Çözümleri</h2>
+            <p class="text-xs sm:text-sm text-slate-600">9 öğrenme birimine göre filtreleyebilir veya anahtar kelimeyle soru arayabilirsiniz.</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <select id="pool-unit-filter" class="px-3 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 font-semibold text-slate-800">
+              <option value="0">Tüm Öğrenme Birimleri (150 Soru)</option>
+              <option value="1">1. Mesleki Eğitim (3308 S.K.)</option>
+              <option value="2">2. Meslek Etiği ve Ahilik</option>
+              <option value="3">3. İş Sağlığı ve Güvenliği</option>
+              <option value="4">4. İletişim</option>
+              <option value="5">5. Eğitim Psikolojisi</option>
+              <option value="6">6. Mesleki Öğretim Yöntemleri</option>
+              <option value="7">7. Öğretim Programı Uygulamaları</option>
+              <option value="8">8. Kalite ve Verimlilik</option>
+              <option value="9">9. Ölçme ve Değerlendirme</option>
+            </select>
+            <input id="pool-search-input" type="text" placeholder="Soru veya kavram ara (örn: çırak, baret)..." class="px-3 py-2 rounded-xl text-xs sm:text-sm bg-slate-50 border border-slate-300 w-56">
+          </div>
+        </div>
+      </div>
+
+      <div id="pool-list-container" class="space-y-3">
+        <!-- Populated by JS -->
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: FREE HOSTING & MULTI-USER DEPLOY GUIDE ==================== -->
+    <section id="view-deploy" class="hidden space-y-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
+          <span>🌐</span> <span>%100 Sunucusuz (Static) Mimari • 10 Gün Değil Yıllarca Ücretsiz ve Sorunsuz Çalışır</span>
+        </div>
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Ücretsiz Hostta Yayınlama ve Çoklu Kullanıcı Paylaşım Rehberi</h2>
+        <p class="text-sm text-slate-600 leading-relaxed">
+          Bu platform <strong>tamamen tek bir HTML dosyası (`index.html`)</strong> içinde çalışacak şekilde tasarlanmıştır. Harici bir veritabanı, PHP/Node.js sunucusu veya ücretli API gerektirmez. Bu sayede 10 gün boyunca (veya istediğiniz kadar süresiz) <strong>aynı anda yüzlerce kişi</strong> linke tıkladığında her kullanıcının sınav süresi, işaretlediği şıklar ve puanları kendi tarayıcısında bağımsız olarak çalışır; kesinlikle çökme veya kota aşımı yaşanmaz.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="text-sm font-extrabold text-blue-900">Yöntem 1: Netlify Drop (30 Saniye - Üyelikli/Ücretsiz)</div>
+            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
+              <li>Size sunduğum <strong>ZIP paketini</strong> veya HTML dosyasını bilgisayarınıza indirin.</li>
+              <li><strong>app.netlify.com/drop</strong> adresine gidin.</li>
+              <li>ZIP dosyasını (veya klasörü) sayfadaki kutuya sürükleyip bırakın.</li>
+              <li>Anında size özel <code>https://...netlify.app</code> linki üretilir. Bu linki WhatsApp veya Telegram grubunuzda paylaşabilirsiniz!</li>
+            </ol>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="text-sm font-extrabold text-blue-900">Yöntem 2: GitHub Pages (Tamamen Ücretsiz &amp; Kalıcı)</div>
+            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
+              <li>GitHub'da ücretsiz yeni bir <strong>Repository (Depo)</strong> açın.</li>
+              <li>ZIP içindeki <code>index.html</code> dosyasını yükleyin (Upload files).</li>
+              <li><strong>Settings → Pages</strong> sekmesinden Branch olarak <code>main</code> seçip kaydedin.</li>
+              <li>1 dakika içinde <code>kullaniciadi.github.io/sinav</code> linkiniz yayına girer.</li>
+            </ol>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+            <div class="text-sm font-extrabold text-blue-900">Yöntem 3: Vercel / Cloudflare Pages / Surge.sh</div>
+            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
+              <li><strong>Cloudflare Pages</strong> veya <strong>Vercel</strong> paneline girip ZIP/klasör yüklemesi yapabilirsiniz.</li>
+              <li>Bant genişliği sınırı olmadan aynı anda binlerce kursiyer telefon, tablet veya bilgisayardan sınav çözebilir.</li>
+              <li>Her aday sınav bitiminde <strong>"Sonuç Karnemi Link Olarak Paylaş"</strong> butonuyla kendi sınav sonucunu eğitmene gönderebilir.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
+          <div class="text-xs text-slate-600">
+            <strong>Doğrudan Deneme Linki Paylaşımı:</strong> Belirli bir denemeye doğrudan link vermek için URL sonuna <code>#exam=deneme-1</code> ekleyebilirsiniz.
+          </div>
+          <button id="back-home-from-deploy-btn" type="button" class="px-4 py-2 rounded-xl bg-blue-700 text-white font-bold text-xs hover:bg-blue-800 transition">
+            ← Sınav Ekranına Dön
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // =========================================================================
+    // DATA: 9 LEARNING UNITS, 150 QUESTION POOL, AND 5 STRUCTURED EXAMS
+    // =========================================================================
+    const UNITS = {"1": "1. Mesleki Eğitim (3308 S.K.)", "2": "2. Meslek Etiği ve Ahilik", "3": "3. İş Sağlığı ve Güvenliği", "4": "4. İletişim", "5": "5. Eğitim Psikolojisi", "6": "6. Mesleki Öğretim Yöntemleri", "7": "7. Öğretim Programı Uygulamaları", "8": "8. Kalite ve Verimlilik", "9": "9. Ölçme ve Değerlendirme"};
+    const QUESTION_POOL = [{"id": 1, "u": 1, "q": "3308 sayılı Mesleki Eğitim Kanunu'na göre, bir mesleğin gerektirdiği bilgi, beceri ve iş alışkanlıklarını kazanmış; bu meslekle ilgili iş ve işlemleri ustanın gözetimi altında kabul edilebilir standartlarda yapabilen kişiye ne denir?", "o": ["Kalfa", "Çırak", "Usta", "Usta öğretici"], "a": 0, "e": "Tanım kalfaya aittir. Çırak mesleği öğrenme aşamasındadır, usta işleri bağımsız yapar, usta öğretici ise eğitim verme yetkisine sahip ustadır."}, {"id": 2, "u": 1, "q": "Aday çırak, çırak ve işletmelerde mesleki eğitim gören öğrencilere işletmelerce her yıl tatil aylarında ne kadar ücretli izin verilir?", "o": ["15 gün", "1 ay", "20 gün", "2 ay"], "a": 1, "e": "3308 sayılı Kanun'un 26. maddesine göre aday çırak, çırak ve öğrencilere her yıl tatil aylarında 1 ay ücretli izin verilir."}, {"id": 3, "u": 1, "q": "Aday çırak ve çırağa ödenecek ücret, yaşına uygun asgari ücretin yüzde kaçından az olamaz?", "o": ["%15", "%25", "%30", "%50"], "a": 2, "e": "3308 sayılı Kanun'a göre aday çırak ve çırağa yaşına uygun asgari ücretin %30'undan aşağı ücret ödenemez."}, {"id": 4, "u": 1, "q": "Bir iş yerinde aday çırak ve çırak çalıştırılabilmesi için iş yerinde kimin bulunması yasal olarak zorunludur?", "o": ["Usta öğretici", "İş güvenliği uzmanı", "İş yeri hekimi", "Koordinatör öğretmen"], "a": 0, "e": "3308 sayılı Kanun'un 15. maddesine göre aday çırak ve çırak eğitimi yapılabilmesi için iş yerinde usta öğretici bulunması şarttır."}, {"id": 5, "u": 1, "q": "Aday çırak, çırak ve işletmelerde mesleki eğitim gören öğrencilerin iş kazası ve meslek hastalığı sigorta primleri kim tarafından ödenir?", "o": ["İşveren", "Öğrencinin velisi", "Millî Eğitim Bakanlığı (Devlet)", "Bağlı olunan meslek odası"], "a": 2, "e": "Öğrenci ve çırakların iş kazası ve meslek hastalığı sigorta primleri Millî Eğitim Bakanlığı bütçesinden (Devlet tarafından) ödenir."}, {"id": 6, "u": 1, "q": "Aşağıdakilerden hangisi mesleki eğitim merkezi (MESEM) programına kayıt için aranan şartlardan biri değildir?", "o": ["En az ortaokul veya imam hatip ortaokulu mezunu olmak", "Bir işletme ile sözleşme imzalamak", "Sağlık durumunun mesleğin öğrenimine elverişli olması", "18 yaşını doldurmamış olmak"], "a": 3, "e": "Mesleki eğitim merkezlerine kayıtta en az ortaokul mezunu olmak ve 14 yaşını doldurmuş olmak gerekir; üst yaş sınırı yoktur."}, {"id": 7, "u": 1, "q": "İşletmelerde mesleki eğitim sözleşmesi kimler arasında imzalanır?", "o": ["Yalnızca işveren ile öğrenci", "İşveren ile usta öğretici", "Okul/kurum müdürü, işveren ve öğrenci (reşit değilse velisi)", "Okul müdürü ile usta öğretici"], "a": 2, "e": "Mesleki eğitim sözleşmesi; okul/merkez müdürü, işveren (veya vekili) ve reşit ise öğrenci, reşit değilse velisi arasında imzalanır."}, {"id": 8, "u": 1, "q": "Ustalık belgesi sahibi bir kişi usta öğreticilik belgesi alabilmek için Bakanlıkça açılan hangi kursu başarıyla tamamlamalıdır?", "o": ["İş yeri açma kursu", "Mesleki gelişim kursu", "Kalfalık hazırlık kursu", "İş pedagojisi kursu"], "a": 3, "e": "3308 sayılı Kanun'un 31. maddesine göre ustalık yeterliğini kazananlar, 40 saatlik İş Pedagojisi kursunu başarıyla tamamlayarak usta öğreticilik belgesi alır."}, {"id": 9, "u": 1, "q": "Dördüncü (4.) veya daha üst seviye Mesleki Yeterlilik Kurumu (MYK) belgesi sahipleri doğrudan hangi sınava alınır?", "o": ["Kalfalık sınavı", "Ustalık sınavı", "Usta öğreticilik sınavı", "Seviye tespit sınavı"], "a": 1, "e": "Seviye 4 ve üzeri MYK Mesleki Yeterlilik Belgesi olanlar kalfalık aşamasını atlayarak doğrudan ustalık sınavına girerler."}, {"id": 10, "u": 1, "q": "Karşılıklı anlaşarak çıraklık sözleşmesini fesheden taraflar, bunu kaç iş günü içerisinde Mesleki Eğitim Merkezi Müdürlüğüne yazılı olarak bildirmelidir?", "o": ["3 iş günü", "5 iş günü", "7 iş günü", "10 iş günü"], "a": 0, "e": "Karşılıklı anlaşmayla sözleşme feshinde 3 iş günü içinde Mesleki Eğitim Merkezi Müdürlüğüne yazılı bildirim yapılması zorunludur."}, {"id": 11, "u": 1, "q": "Ustalık belgesi bulunan kişiler aşağıdaki yetki ve özelliklerden hangisine sahiptir?", "o": ["Üretimle ilgili problemleri bağımsız çözebilir", "Bağımsız olarak kendi iş yerini açabilir", "Usta öğreticilik (iş pedagojisi) kursuna katılabilir", "Hepsi"], "a": 3, "e": "Usta; üretimi bağımsız planlar ve sorunları çözer, kendi iş yerini açabilir ve iş pedagojisi kursuna katılabilir."}, {"id": 12, "u": 1, "q": "Aşağıdakilerden hangisi çıraklık eğitim sistemine kabul edilmez?", "o": ["Kadın adaylar", "18 yaşından küçükler", "18 yaşından büyükler", "Okuma yazma bilmeyenler"], "a": 3, "e": "Çıraklık eğitimine başlamak için en az ortaokul/imam hatip ortaokulu mezunu olmak şarttır; okuma yazma bilmeyenler kabul edilmez."}, {"id": 13, "u": 1, "q": "Aşağıda verilen belgelerden hangisi 3308 sayılı Mesleki Eğitim Kanunu'na tabi belgelerden biri değildir?", "o": ["İş yeri açma belgesi", "Kalfalık belgesi", "Ustalık belgesi", "Sanayi sicil belgesi"], "a": 3, "e": "Kalfalık, ustalık, usta öğreticilik ve iş yeri açma belgeleri 3308 sayılı Kanun'a tabidir; sanayi sicil belgesi Sanayi ve Teknoloji Bakanlığı mevzuatına aittir."}, {"id": 14, "u": 1, "q": "3308 sayılı Mesleki Eğitim Kanunu'na göre mesleki eğitim kapsamındaki iş yerleri kaç yaşından küçük kişileri çırak olarak çalıştıramaz?", "o": ["12", "14", "16", "18"], "a": 1, "e": "Çıraklık eğitimine başlayabilmek için 14 yaşını doldurmuş olmak gerekir; 14 yaşından küçükler çalıştırılamaz."}, {"id": 15, "u": 1, "q": "Çırak öğrencilere verilen 1 ay süreli ücretli yıllık izin hangi dönemde kullandırılır?", "o": ["Hiçbir zaman", "Yılın herhangi bir haftasında ders günlerinde", "Teorik eğitim zamanları (okul dönemleri) dışında, tatil aylarında", "Sadece resmi bayram tatillerinde"], "a": 2, "e": "1 aylık ücretli izin, teorik eğitimin olmadığı tatil aylarında kullandırılır."}, {"id": 16, "u": 1, "q": "Çıraklık sözleşmesi esaslarına göre bir meslek alanında mesleğin gerektirdiği bilgi, beceri ve iş alışkanlıklarını iş içerisinde geliştiren kişi kimdir?", "o": ["Usta öğretici", "Kalfa", "Çırak", "Usta"], "a": 2, "e": "Çıraklık sözleşmesi esaslarına göre mesleği iş içerisinde geliştiren kişiye çırak denir."}, {"id": 17, "u": 1, "q": "3308 sayılı Kanun'a göre kalfalık belgesi aldıktan sonra mesleğinde en az kaç yıl çalışmış olanlar doğrudan ustalık sınavlarına katılabilir?", "o": ["1 yıl", "2 yıl", "3 yıl", "5 yıl"], "a": 3, "e": "Kalfalık yeterliğini kazanmış olup mesleklerinde en az 5 yıl संघ/sigortalı çalışmış olanlar doğrudan ustalık sınavlarına girebilirler."}, {"id": 18, "u": 1, "q": "Mezuniyet diplomasıyla (kendi alanında) sınava girmeden doğrudan iş yeri açma belgesi alabilenler aşağıdakilerden hangisidir?", "o": ["Ortaokul mezunları", "Kalfalık belgesi sahipleri", "En az 4 yıllık ilgili fakülte/yüksekokul mezunları", "Aday çıraklar"], "a": 2, "e": "İlgili meslek alanında en az lisans (4 yıllık fakülte) veya ilgili mesleki teknik eğitim mezunları doğrudan iş yeri açma hakkına sahiptir."}, {"id": 19, "u": 1, "q": "3308 sayılı Mesleki Eğitim Kanunu'na göre kanun kapsamındaki meslek dallarında kendi adına bağımsız iş yeri açabilmek için hangi belgeye sahip olmak zorunludur?", "o": ["Kalfalık belgesi", "Ustalık belgesi", "Çıraklık sözleşmesi", "Sürücü belgesi"], "a": 1, "e": "Kanun kapsamındaki meslek dallarında bağımsız iş yeri açmak için Ustalık Belgesi (veya İş Yeri Açma Belgesi) zorunludur."}, {"id": 20, "u": 1, "q": "3308 sayılı Mesleki Eğitim Kanunu'na göre aday çırak ve çırakların statüsü hakkında aşağıdakilerden hangisi doğrudur?", "o": ["İş yerinin kadrolu memurudurlar", "İş yerinde tam zamanlı işçi statüsündedirler", "Öğrenci statüsündedirler ve öğrencilik haklarından yararlanırlar", "İş yerinin ortağı sayılırlar"], "a": 2, "e": "Aday çırak ve çıraklar öğrenci statüsündedirler ve her türlü öğrencilik haklarından yararlanırlar; işçi sayısına dahil edilmezler."}, {"id": 21, "u": 1, "q": "Mesleki eğitim merkezlerinde (MESEM) kayıtlı çırak öğrenciler 11. sınıf sonunda hangi belgeyi almak için beceri sınavına girerler?", "o": ["Çıraklık belgesi", "Kalfalık belgesi", "Ustalık belgesi", "Usta öğreticilik belgesi"], "a": 1, "e": "MESEM programında 11. sınıfın sonunda kalfalık sınavına, 12. sınıfın sonunda ise ustalık sınavına girilir."}, {"id": 22, "u": 1, "q": "Mesleki eğitim merkezlerinde (MESEM) kayıtlı öğrenciler 12. sınıf sonunda hangi belgeyi almak için sınava girerler?", "o": ["Aday çıraklık belgesi", "Kalfalık belgesi", "Ustalık belgesi", "İş pedagojisi belgesi"], "a": 2, "e": "MESEM 4 yıllık (9-12. sınıf) programın 12. sınıf sonunda başarılı olan öğrenciler Ustalık Belgesi ve Mesleki Eğitim Merkezi Diploması alırlar."}, {"id": 23, "u": 1, "q": "Aşağıdakilerden hangisi aday çırak ve çırağa ödenecek ücretin vergi ve kesinti durumu için doğrudur?", "o": ["%20 gelir vergisi kesilir", "Her türlü vergiden muaftır", "%15 damga vergisi kesilir", "Belediye harcı kesilir"], "a": 1, "e": "3308 sayılı Kanun'un 25. maddesine göre aday çırak, çırak ve öğrencilere ödenen ücretler her türlü vergiden müstesnadır (muaftır)."}, {"id": 24, "u": 1, "q": "10 ve daha fazla personel çalıştıran işletmeler, çalıştırdıkları personel sayısının en az yüzde kaçı kadar mesleki ve teknik eğitim okul ve kurumu öğrencisine beceri eğitimi yaptırmakla yükümlüdür?", "o": ["%1", "%5", "%15", "%25"], "a": 1, "e": "3308 sayılı Kanun'un 18. maddesine göre 10 ve daha fazla personel çalıştıran işletmeler, personel sayısının %5'inden az olmamak üzere mesleki eğitim yaptırmakla yükümlüdür."}, {"id": 25, "u": 1, "q": "Mesleki eğitim merkezi öğrencilerinin teorik eğitimleri haftada en az kaç gün olacak şekilde planlanır?", "o": ["Haftada en az 1 gün (veya 2 gün)", "Haftada 5 gün", "Ayda 1 gün", "Yılda 1 gün"], "a": 0, "e": "MESEM'de teorik eğitim haftada en az 1 gün (veya ders yüküne göre 2 gün) okulda, işletmede beceri eğitimi ise 4 veya 5 gün iş yerinde yapılır."}, {"id": 26, "u": 2, "q": "13. yüzyılda Anadolu'da kurulan Ahilik teşkilatının kurucusu olarak kabul edilen mutasavvıf ve bilgin kimdir?", "o": ["Hacı Bektaş Veli", "Yunus Emre", "Ahi Evran", "Mevlana Celaleddin Rumi"], "a": 2, "e": "Ahilik teşkilatının kurucusu Kırşehir merkezli olarak teşkilatı kuran Ahi Evran-ı Veli'dir (debbağların/dericilerin piri)."}, {"id": 27, "u": 2, "q": "Ahilikte meslekte yükselen (kalfalıktan ustalığa geçen) kişiye törenle bele kuşak bağlanmasına ne ad verilir?", "o": ["Şed kuşanma", "Yol kardeşliği", "Yiğitbaşılık", "Fütüvvetname"], "a": 0, "e": "Şed kuşanma (peştamal kuşanma), Ahilikte mesleki yeterliği kanıtlayıp ustalığa geçişin simgesi olan törendir."}, {"id": 28, "u": 2, "q": "Aşağıdakilerden hangisi Ahilik eğitim sisteminin temel özelliklerinden biri değildir?", "o": ["Eğitim ömür boyu süren bir süreçtir", "İş başındaki eğitim, iş dışındaki ahlaki eğitimle bütünleşir", "Dersler yetkili ve ehil kişiler tarafından verilir", "Eğitim belirli bir yaş ve kısa bir süreyle sınırlıdır"], "a": 3, "e": "Ahilikte eğitim yaşam boyu sürer ve ücretsizdir; belirli bir süreyle sınırlı değildir."}, {"id": 29, "u": 2, "q": "Aşağıdakilerden hangisi kökeni Ahilik teşkilatına dayanan günümüz kurumlarından biri değildir?", "o": ["Esnaf ve sanatkârlar odaları", "Türkiye Barolar Birliği", "Esnaf kefalet kooperatifleri", "Bağ-Kur (esnaf sosyal güvenliği)"], "a": 1, "e": "Esnaf odaları, kefalet kooperatifleri, Halk Bankası ve Bağ-Kur Ahilik geleneğine dayanır; Barolar Birliği avukatların meslek örgütüdür."}, {"id": 30, "u": 2, "q": "Aşağıdakilerden hangisi meslek etiği ilkeleriyle bağdaşmaz?", "o": ["Dürüstlük ve doğruluk", "Mesleki sorumluluk", "Müşteriyi yanıltarak haksız kazanç sağlama", "Meslektaşlara ve emeğe saygı"], "a": 2, "e": "Müşteriyi yanıltarak kazanç sağlamak meslek etiğinin ve Ahilik ilkelerinin doğrudan ihlalidir."}, {"id": 31, "u": 2, "q": "Aşağıdakilerden hangisi Ahilik teşkilatında uygulanan mesleki ve sosyal törenlerden biri değildir?", "o": ["Yiğitbaşılık töreni", "Yol sahibi olma töreni", "Yol kardeşliği töreni", "Şed kuşanma töreni"], "a": 0, "e": "Yol sahibi olma, yol kardeşliği ve şed kuşanma temel Ahi törenleridir; 'yiğitbaşılık töreni' diye bir tören adı müfredatta yer almaz."}, {"id": 32, "u": 2, "q": "Aşağıdakilerden hangisi Ahilik kültürünün ve teşkilatının oluşmasında en önemli paya sahiptir?", "o": ["Ülkedeki asker eksikliği", "Ahlaklı ve nitelikli personel (zanaatkâr) ihtiyacı", "Yalnızca yüksek vergi toplama amacı", "Tarımsal üretimi durdurma isteği"], "a": 1, "e": "Ahilik, sanat ve meslek bilgisini güzel ahlakla birleştiren 'ahlaklı ve nitelikli üretici/personel' ihtiyacından doğmuştur."}, {"id": 33, "u": 2, "q": "Aşağıdakilerden hangisi Ahiliğin bireyin kişisel gelişimine katkılarından biri olarak sınıflandırılmaz?", "o": ["Sabırlı olma", "Güler yüzlü olma", "Emeğin kutsallığı", "Öfkelenmeme"], "a": 2, "e": "Sabırlı olma, güler yüzlü olma ve öfkelenmeme kişisel ahlaki gelişim özellikleridir; 'emeğin kutsallığı' ise ekonomik/mesleki bir ilkedir."}, {"id": 34, "u": 2, "q": "Ahilik teşkilatının ahlak ve davranış kurallarını içeren temel tüzük/yönetmelik niteliğindeki eserlere ne ad verilir?", "o": ["Fütüvvetname", "Seyahatname", "Siyasetname", "Ruzname"], "a": 0, "e": "Ahilik teşkilatının kurallarını, törenlerini ve ahlaki ilkelerini yazılı hale getiren eserlere 'Fütüvvetname' denir."}, {"id": 35, "u": 2, "q": "Ahilikte kalitesiz mal üreten veya müşteriyi aldatan esnafa uygulanan 'meslekten geçici men edilme ve sembolik olarak ayakkabısının dama atılması' deyimi hangisidir?", "o": ["Pabucu dama atılmak", "Kemer bağlamak", "Sikke basmak", "Kefil olmak"], "a": 0, "e": "Kusurlu mal üreten veya hile yapan esnafın iş yeri kapatılır ve pabucu dama atılırdı; 'pabucu dama atılmak' deyimi buradan gelir."}, {"id": 36, "u": 2, "q": "Ahilik teşkilatında esnafın kendi aralarında para toplayarak kurdukları yardımlaşma ve sosyal güvenlik sandığına ne ad verilirdi?", "o": ["Orta Sandığı (Esnaf Vakfı)", "Darphane", "Bedesten", "Kervansaray"], "a": 0, "e": "Ahilikte üyelerin aidat ve bağışlarıyla oluşturulan sosyal yardımlaşma ve kredi fonuna 'Orta Sandığı' denir."}, {"id": 37, "u": 2, "q": "Ahiliğin temel felsefesini özetleyen “Eline, beline, diline sahip ol” ilkesinde 'diline sahip olmak' neyi ifade eder?", "o": ["Yalan söylememek, iftira ve dedikodudan uzak durmak", "Çok hızlı konuşmak", "Yabancı dil öğrenmek", "Müşteriyle hiç konuşmamak"], "a": 0, "e": "Eline sahip olmak hırsızlık/haram yememeyi, beline sahip olmak iffeti, diline sahip olmak ise yalan ve kırıcı sözden sakınmayı ifade eder."}, {"id": 38, "u": 2, "q": "Aşağıdakilerden hangisi sosyal ahlak ve görgü kurallarına uygun bir davranıştır?", "o": ["Ortak kullanım alanlarında sırada öne geçmemek ve başkalarının hakkına saygı duymak", "Müşterilere kişiye göre farklı fiyat uygulamak", "Meslek sırlarını rakiplere satmak", "Çırakları kendi özel ev işlerinde çalıştırmak"], "a": 0, "e": "Sırada öne geçmemek ve toplumsal düzene saygı göstermek sosyal ahlak kurallarının gereğidir."}, {"id": 39, "u": 2, "q": "Aşağıdakilerden hangisi meslek ahlakı (etiği) ilkelerinden biridir?", "o": ["Mesleğe bağlı olmak ve işini standartlara uygun yapmak", "Sadece kendi çıkarına göre davranmak", "Mesleki gelişime kapalı olmak", "Müşteriler arasında ayrımcılık yapmak"], "a": 0, "e": "Mesleğe bağlılık, dürüstlük, tarafsızlık ve kalite meslek ahlakının temel ilkelerindendir."}, {"id": 40, "u": 2, "q": "Ahilik teşkilatında çıraklığa adım atmadan önce çocuğun mesleğe ve ortama ısındığı ilk basamağa ne ad verilirdi?", "o": ["Yamak", "Kalfa", "Usta", "Ahi Baba"], "a": 0, "e": "Ahilikte mesleki hiyerarşi: Yamak -> Çırak -> Kalfa -> Usta -> Yiğitbaşı -> Ahi Baba şeklindedir."}, {"id": 41, "u": 3, "q": "İş kazalarının meydana gelme nedenleri arasında birinci (en yüksek) sırada aşağıdakilerden hangisi yer alır?", "o": ["Tehlikeli (güvensiz) davranışlar", "Tehlikeli durumlar", "Doğal afetler", "Nedeni bulunamayan sebepler"], "a": 0, "e": "İSG istatistiklerine göre iş kazalarının %88'i çalışanların tehlikeli davranışlarından, %10'u tehlikeli durumlardan, %2'si kaçınılmaz sebeplerden kaynaklanır."}, {"id": 42, "u": 3, "q": "İş sağlığı ve güvenliği araştırmalarına göre iş kazalarının yaklaşık yüzde kaçı önlenebilir kazalardır?", "o": ["%10", "%50", "%75", "%98"], "a": 3, "e": "İş kazalarının %98'i alınacak tedbir ve eğitimlerle önlenebilir; yalnızca %2'si önlenemez (kaçınılmaz) niteliktedir."}, {"id": 43, "u": 3, "q": "İş kazalarının yüzde kaçı önlenemez (kaçınılmaz/doğal sebepli) kazalar olarak kabul edilir?", "o": ["%2", "%10", "%20", "%50"], "a": 0, "e": "İş kazalarının %98'i önlenebilir, %2'si ise önlenemez kazalardır."}, {"id": 44, "u": 3, "q": "Tozlu, gazlı veya kimyasal buharlı ortamlarda solunum sistemini korumak için kullanılan kişisel koruyucu donanım (KKD) hangisidir?", "o": ["Baret", "Kulak tıkacı", "Eldiven", "Maske"], "a": 3, "e": "Solunum yollarını koruyan donanım maskedir; baret başı, kulak tıkacı kulağı, eldiven elleri korur."}, {"id": 45, "u": 3, "q": "Aşağıdakilerden hangisi meslek hastalıklarının sınıflandırıldığı etken gruplarından biri değildir?", "o": ["Kimyasal etkenler", "Fiziksel etkenler", "Biyolojik etkenler", "Meteorolojik (veya doğal) etkenler"], "a": 3, "e": "Meslek hastalıkları kimyasal, fiziksel, biyolojik, psikolojik ve ergonomik etkenlerle oluşur; meteorolojik etken diye bir sınıf yoktur."}, {"id": 46, "u": 3, "q": "Aşağıdakilerden hangisi bir iş kazasının doğrudan (görünen) zararlarından biridir?", "o": ["Sipariş ve pazar kayıpları", "Kaybolan iş günleri ve iş gücü", "Tıbbi tedavi, ilk yardım ve tazminat giderleri", "İşletmenin itibar kaybı"], "a": 2, "e": "Tedavi, hastane ve tazminat ödemeleri doğrudan (görünen) zararlardır; iş günü, üretim ve sipariş kayıpları dolaylı zararlardır."}, {"id": 47, "u": 3, "q": "Aşağıdakilerden hangisi iş kazalarında dolaylı (görünmeyen) zararlardan biri değildir?", "o": ["Kaybolan iş günü ve iş gücü", "Sipariş ve üretim kayıpları", "Tazminat ve ilk yardım maliyetleri", "Üretim sürecinin aksaması"], "a": 2, "e": "Tazminat ve tedavi maliyetleri doğrudan (görünen) zarardır; dolaylı zarar değildir."}, {"id": 48, "u": 3, "q": "6331 sayılı İş Sağlığı ve Güvenliği Kanunu'na göre çalışanların iş sağlığı ve güvenliği eğitimi almasını sağlamak kimin yükümlülüğüdür?", "o": ["Çalışanın kendisinin", "Belediyenin", "Meslek odasının", "İşverenin"], "a": 3, "e": "6331 sayılı Kanun'a göre işveren, çalışanların İSG eğitimlerini almasını sağlamak ve maliyetini karşılamakla yükümlüdür."}, {"id": 49, "u": 3, "q": "Bir çalışan iş yerinde çalışırken kafasına yukarıdan sert bir cisim düşmüş ve iş kazası geçirmiştir. Bu tür kazalardan korunmak için hangi KKD kullanılmalıdır?", "o": ["Baret", "Eldiven", "Koruyucu gözlük", "İş elbisesi"], "a": 0, "e": "Baş bölgesini düşen cisimlere ve darbelere karşı koruyan kişisel koruyucu donanım barettir."}, {"id": 50, "u": 3, "q": "Binaların havalandırma tesisatları iyi çalışmaz ve çalışma ortamında aşırı yüksek sıcaklık olursa aşağıdakilerden hangisi gerçekleşmez?", "o": ["Nabız yükselir", "Terleme artar", "Dikkat azalır", "Verimlilik artar"], "a": 3, "e": "Yüksek sıcaklık ve yetersiz havalandırmada dikkat azalır ve yorgunluk artar; verimlilik artmaz, aksine düşer."}, {"id": 51, "u": 3, "q": "Aşağıdakilerden hangisi iş sağlığı ve güvenliği ile doğrudan ilgili kurum veya kuruluşlardan biri değildir?", "o": ["İş Sağlığı ve Güvenliği Genel Müdürlüğü", "Mesleki Yeterlilik Kurumu", "Orman Genel Müdürlüğü", "Sosyal Güvenlik Kurumu Başkanlığı"], "a": 2, "e": "Orman Genel Müdürlüğü ormancılık faaliyetlerini yürütür; doğrudan İSG düzenleyici kurumu değildir."}, {"id": 52, "u": 3, "q": "Bir yanma olayının (yangının) oluşabilmesi için aşağıdaki unsurlardan hangilerinin (yangın üçgeni) bir arada bulunması gerekir?", "o": ["Yanıcı madde - Oksijen - Sıcaklık (Isı)", "Oksijen - Su - Köpük", "Sıcaklık - Azot - Kum", "Karbondioksit - Hava - Su"], "a": 0, "e": "Yangın üçgeni; yanıcı madde, yakıcı madde (oksijen) ve tutuşma sıcaklığından (ısı) oluşur."}, {"id": 53, "u": 3, "q": "Aşağıdakilerden hangisi yangın söndürücü maddelerden biri değildir?", "o": ["Su", "Köpük", "Kuru kimyevi toz", "Oksijen (Hava)"], "a": 3, "e": "Oksijen (hava) yangını söndürmez, aksine yanmayı hızlandıran yakıcı maddedir."}, {"id": 54, "u": 3, "q": "Sigortalının çalıştırıldığı işin niteliğine göre tekrarlanan bir sebeple veya işin yürütüm şartları yüzünden uğradığı geçici veya sürekli hastalık, bedensel veya ruhsal engellilik hallerine ne denir?", "o": ["Meslek hastalığı", "İş kazası", "Mevsimsel grip", "Ev kazası"], "a": 0, "e": "İşin niteliğinden dolayı zamanla ve tekrarlanan etkenlerle ortaya çıkan hastalıklara meslek hastalığı denir."}, {"id": 55, "u": 3, "q": "Aşağıdakilerden hangisi ilk yardımın temel amaçlarından biri değildir?", "o": ["Hayati tehlikeyi ortadan kaldırmak", "İyileşmeyi kolaylaştırmak", "Hastaya ilaç tedavisi uygulamak", "Durumun kötüleşmesini önlemek"], "a": 2, "e": "İlk yardım olay yerinde tıbbi araç-gereç aranmaksızın ve ilaçsız olarak yapılır; ilaç tedavisi hekimin görevidir."}, {"id": 56, "u": 3, "q": "Aşağıdaki durumlardan hangisi 5510 sayılı Kanun kapsamında 'iş kazası' sayılır?", "o": ["İzin gününde ailesiyle pikniğe giderken kaza geçirmek", "İşverence sağlanan servis aracıyla işe gidip gelirken kaza geçirmek", "İş yeri yakınındaki kıraathanede mesai dışında yaralanmak", "Kendi özel aracıyla tatil beldesine giderken kaza yapmak"], "a": 1, "e": "Sigortalının işverence sağlanan bir taşıtla (servisle) işin yapıldığı yere götürülüp getirilmesi sırasında meydana gelen kazalar iş kazasıdır."}, {"id": 57, "u": 3, "q": "Aşağıdaki tehlike ve kişisel koruyucu donanım (KKD) eşleştirmelerinden hangisi yanlıştır?", "o": ["Zehirli gaz ve toz -> Maske", "Yüksekte çalışma -> Emniyet kemeri", "Yüksek gürültü -> Kulaklık / Kulak tıkacı", "Metal çapak ve kıvılcım -> Bez eldiven ile gözleri kapama"], "a": 3, "e": "Metal çapak, kıvılcım ve sıçramalara karşı gözleri korumak için 'koruyucu gözlük veya yüz siperi' kullanılmalıdır."}, {"id": 58, "u": 3, "q": "İş yerinde 175 cm ve üzeri yükseklikte yapılan çalışmalarda düşmeyi önlemek için kullanılan temel kişisel koruyucu donanım hangisidir?", "o": ["Paraşüt tipi emniyet kemeri", "Kulak tıkacı", "Toz maskesi", "Kaynak gözlüğü"], "a": 0, "e": "Yüksekte çalışmalarda düşmeyi durdurmak için paraşüt tipi emniyet kemeri ve yaşam hattı kullanılır."}, {"id": 59, "u": 3, "q": "İş sağlığı ve güvenliği güvenlik renklerinden 'Kırmızı' ve 'Yeşil' sırasıyla ne anlama gelir?", "o": ["Kırmızı: Yasak / Tehlike / Yangın — Yeşil: Acil çıkış / İlk yardım / Güvenli durum", "Kırmızı: Güvenli alan — Yeşil: Patlama tehlikesi", "Kırmızı: Zorunluluk — Yeşil: Uyarı", "Kırmızı: Bilgi — Yeşil: Yasak"], "a": 0, "e": "Güvenlik işaretlerinde Kırmızı yasak/tehlike/yangın ekipmanını, Sarı uyarıyı, Mavi zorunluluğu, Yeşil ise acil çıkış ve ilk yardımı gösterir."}, {"id": 60, "u": 3, "q": "Bütün mesleklerde çalışanların sağlıklarını sosyal, ruhsal ve bedensel olarak en üst düzeyde sürdürmek ve çalışma koşullarını sağlığa uygun hale getirmek amacıyla kurulan bilim dalı hangisidir?", "o": ["Mobbing", "İş sağlığı ve güvenliği", "Pazarlama yönetimi", "Finansal denetim"], "a": 1, "e": "Tanım, çalışanların sağlığını ve güvenliğini korumayı amaçlayan İş Sağlığı ve Güvenliği (İSG) disiplinine aittir."}, {"id": 61, "u": 4, "q": "Aşağıdakilerden hangisi iletişim sürecinin temel ögelerinden (elemanlarından) biri değildir?", "o": ["Kaynak (Verici)", "Mesaj (İleti)", "Alıcı (Hedef)", "Ölçüt (veya Plan)"], "a": 3, "e": "İletişim sürecinin temel ögeleri: Kaynak, Mesaj, Kanal, Alıcı ve Geri Bildirimdir (Dönüt). Ölçüt ve Plan iletişim ögesi değildir."}, {"id": 62, "u": 4, "q": "Kaynağın gönderdiği mesaj ile alıcının aldığı mesaj arasında fark oluşmasına yol açan her türlü engelleyici etkene iletişimde ne ad verilir?", "o": ["Gürültü", "Kodlama", "Dönüt (Geri bildirim)", "Kanal"], "a": 0, "e": "İletişim sürecini olumsuz etkileyen fiziksel, psikolojik veya anlamsal engellerin tamamına 'gürültü' denir."}, {"id": 63, "u": 4, "q": "Usta öğreticinin işletmede çırak ve öğrencilere beceri eğitimi verirken en fazla kullandığı iletişim türü hangisidir?", "o": ["Sözlü iletişim", "Yazılı iletişim", "Kitle iletişimi", "Resmî dilekçe"], "a": 0, "e": "İş başı beceri eğitimi yüz yüze anlatım, gösterim ve soru-cevapla yürüdüğü için en çok sözlü iletişim (ve beden dili) kullanılır."}, {"id": 64, "u": 4, "q": "Beden dilinde konuşurken göz temasından kaçınma genellikle hangi duygunun belirtisi olarak yorumlanır?", "o": ["Kendine aşırı güven", "Suçluluk veya bir şey saklama duygusu", "İş birliğine açıklık", "Rahatlık ve samimiyet"], "a": 1, "e": "Göz temasından kaçınma genellikle çekingenlik, suçluluk veya bir şeyi gizleme duygusuyla ilişkilendirilir."}, {"id": 65, "u": 4, "q": "Aşağıdakilerden hangisi etkin (iyi) bir dinleyicinin özelliklerinden biri değildir?", "o": ["Konuşanın sözünü kesmemek", "Göz teması kurmak", "Karşı taraf konuşurken vereceği cevabı önceden hazırlayıp bitmesini beklemek", "Anlaşılanı özetleyerek geri bildirim vermek"], "a": 2, "e": "Konuşmayı dinlemek yerine kendi cevabını kurgulamak etkin dinlemeyi engeller."}, {"id": 66, "u": 4, "q": "Aşağıdaki eğitim araçlarından hangisi hem görsel (göze) hem de işitsel (kulağa) hitap ederek öğrenmeyi kolaylaştırır?", "o": ["Ürün kataloğu", "Radyo", "Gazete", "Televizyon (veya Video)"], "a": 3, "e": "Televizyon ve video hem görüntülü (görsel) hem sesli (işitsel) eğitim araçlarıdır."}, {"id": 67, "u": 4, "q": "Aşağıdakilerden hangisi yalnızca kulağa (işitsel duyuya) hitap eden eğitim ve iletişim aracıdır?", "o": ["Resimler", "Radyo", "Kataloglar", "Kitaplar"], "a": 1, "e": "Radyo yalnızca işitme duyusuna (kulağa) hitap eder; resim, katalog ve kitap görsel araçlardır."}, {"id": 68, "u": 4, "q": "Aşağıdakilerden hangisi iletişimi olumsuz etkileyen (engelleyen) faktörlerden biridir?", "o": ["Soyut ve anlaşılmayan kelimeler kullanmak", "Yabancı kelimeleri sık kullanmak", "Fiziki algı ve anlatım bozuklukları", "Hepsi"], "a": 3, "e": "Soyut/anlaşılmaz ifadeler, gereksiz yabancı sözcükler ve fiziksel bozuklukların tamamı iletişimi güçleştirir."}, {"id": 69, "u": 4, "q": "Beden dilinde 'tırnak ısırma' davranışı genellikle hangi duyguyu yansıtan bir mesajdır?", "o": ["Rahatlık ve huzur", "Endişe ve kaygı", "Öz güven", "Mutluluk"], "a": 1, "e": "Tırnak ısırma beden dilinde stres, endişe ve kaygıyı yansıtır."}, {"id": 70, "u": 4, "q": "Aşağıdakilerden hangisi iş yerinde insan ilişkilerinde olumlu bir davranış örneğidir?", "o": ["Sürekli yıkıcı tenkitlerde bulunmak", "Çalışanlara ayrımcı muamele yapmak", "Kendi fikirlerini zorla kabul ettirmek", "Yapılan başarılı işi takdir etmek"], "a": 3, "e": "Yapılan iyi işi takdir etmek çalışan motivasyonunu ve iş yeri iletişimini güçlendirir."}, {"id": 71, "u": 4, "q": "Aşağıdakilerden hangisi iletişimin tanımlarından biri değildir?", "o": ["Bilgi, duygu ve düşünce alışverişidir", "Kaynaktan hedefe doğru aktarılan haber sürecidir", "Ölçme ve puanlama sürecidir", "İnsanların tutumlarını sözlü, yazılı ve sözsüz iletmesidir"], "a": 2, "e": "Ölçme ve puanlama, ölçme-değerlendirme biriminin konusudur; iletişimin tanımı değildir."}, {"id": 72, "u": 4, "q": "Aşağıdakilerden hangisi iletişimi engelleyen faktörlerden biri değildir?", "o": ["Fiziksel anlatım bozuklukları", "Anlaşılmayan terimler kullanma", "Konuşurken başka bir işle meşgul olma", "İletişim kurulan kişiye odaklanma"], "a": 3, "e": "İletişim kurulan kişiye odaklanmak iletişimi engellemez, aksine sağlıklı iletişimi sağlar."}, {"id": 73, "u": 4, "q": "Aşağıdakilerden hangisi görsel (göze hitap eden) iletişim araçlarından biri değildir?", "o": ["Radyo", "Gazete", "Kitap", "Afiş"], "a": 0, "e": "Gazete, kitap ve afiş görsel araçlardır; radyo ise işitsel araçtır."}, {"id": 74, "u": 4, "q": "Alıcının, kaynağın gönderdiği mesaja verdiği tepkiye (cevaba) iletişim sürecinde ne ad verilir?", "o": ["Geri bildirim (Dönüt)", "Kanal", "Gürültü", "Filtreleme"], "a": 0, "e": "Alıcının mesajı alıp almadığını veya nasıl anladığını kaynağa bildiren tepkiye 'geri bildirim (dönüt)' denir."}, {"id": 75, "u": 4, "q": "Bir kişinin kendisini karşısındaki kişinin yerine koyarak onun duygu ve düşüncelerini doğru anlamaya çalışmasına ne denir?", "o": ["Empati (Duygudaşlık)", "Sempati", "Telepati", "Otorite"], "a": 0, "e": "Kişinin kendisini başkasının yerine koyarak olaylara onun bakış açısıyla bakmasına 'empati' denir."}, {"id": 76, "u": 5, "q": "“Bireyin davranışlarında kendi yaşantısı yoluyla ve kasıtlı olarak istendik değişme meydana getirme süreci” hangi kavramın tanımıdır?", "o": ["Öğrenme", "Gelişim", "Eğitim", "Olgunlaşma"], "a": 2, "e": "Selahattin Ertürk'ün klasik tanımıyla bireyin davranışlarında kendi yaşantısı yoluyla ve kasıtlı olarak istendik değişme meydana getirme sürecine 'eğitim' denir."}, {"id": 77, "u": 5, "q": "Yaşantı ve tekrar sonucunda bireyin davranışlarında meydana gelen nispeten kalıcı izli değişikliğe ne ad verilir?", "o": ["Öğrenme", "Güdü", "Refleks", "Büyüme"], "a": 0, "e": "Yaşantı ve tekrar ürünü olan kalıcı izli davranış değişikliğine 'öğrenme' denir."}, {"id": 78, "u": 5, "q": "Aşağıdakilerden hangisi öğrenmeyi etkileyen bireysel (öğrenene bağlı) etkenlerden biridir?", "o": ["Öğrenme ortamının ışığı", "Öğrencinin zekâsı", "Ortamın sıcaklığı", "Sınıfın kalabalıklığı"], "a": 1, "e": "Zekâ, yaş, yetenek, güdülenme ve ön bilgiler bireysel etkenlerdir; ışık, ısı ve sınıf ortamı çevresel etkenlerdir."}, {"id": 79, "u": 5, "q": "Aşağıdakilerden hangisi öğrenmeye etki eden çevresel etkenlerden biridir?", "o": ["Öğrencinin yeteneği", "Öğrencinin yaşı", "Öğrencinin içinde yaşadığı aile çevresi", "Öğrencinin genel sağlık durumu"], "a": 2, "e": "Öğrencinin içinde yaşadığı aile ve sosyal çevre, çevresel öğrenme etkenidir."}, {"id": 80, "u": 5, "q": "Aşağıdakilerden hangisi insan gelişim alanlarından (türlerinden) biri değildir?", "o": ["Bilişsel gelişim", "Fiziksel (bedensel) gelişim", "Psiko-sosyal gelişim", "Çevresel gelişim"], "a": 3, "e": "Gelişim; fiziksel, bilişsel ve psiko-sosyal gelişim olarak incelenir; 'çevresel gelişim' diye bir gelişim alanı yoktur."}, {"id": 81, "u": 5, "q": "Özellikle küçük yaşlardaki çocukların ve çırakların eğitiminde taklidin önemli yer tuttuğu, ustayı izleyerek gerçekleşen öğrenme türü hangisidir?", "o": ["Klasik koşullanma", "Edimsel koşullanma", "Model alarak (gözlem yoluyla) öğrenme", "Kavrayarak öğrenme"], "a": 2, "e": "Taklit ve gözleme dayalı öğrenmeye 'model alarak (sosyal) öğrenme' denir."}, {"id": 82, "u": 5, "q": "İstenilen bir davranışın ardından hoşa giden bir uyarıcı (ödül/takdir) sunularak o davranışın tekrarlanma olasılığını artırma işlemine ne denir?", "o": ["Pekiştirme", "Sönme", "Ceza", "Unutma"], "a": 0, "e": "Davranışın yapılma sıklığını artıran işleme 'pekiştirme', kullanılan araca ise 'pekiştireç' denir."}, {"id": 83, "u": 5, "q": "Aşağıdakilerden hangisi organizmanın doğrudan veya dolaylı olarak gözlenebilen her türlü etkinliğidir?", "o": ["Güdü", "Davranış", "Bilinçaltı", "Kalıtım"], "a": 1, "e": "Organizmanın dışarıdan doğrudan veya dolaylı gözlenebilen tüm tepki ve etkinliklerine 'davranış' denir."}, {"id": 84, "u": 5, "q": "Aşağıdakilerden hangisi eğitim bilimi ile psikoloji biliminin ortak çalışma noktasıdır?", "o": ["İnsan davranışı", "Yeryüzü şekilleri", "Ekonomik enflasyon", "Tarihî belgeler"], "a": 0, "e": "Psikoloji insan davranışlarını inceler, eğitim ise insan davranışlarını istendik yönde değiştirmeyi amaçlar; ortak noktaları 'insan davranışı'dır."}, {"id": 85, "u": 5, "q": "Gelişim psikolojisine göre erkeklerde ergenlik çağı genel olarak hangi yaş aralığını kapsar?", "o": ["13 - 18 yaş", "15 - 22 yaş", "8 - 10 yaş", "20 - 25 yaş"], "a": 0, "e": "Erkeklerde ergenlik dönemi genel olarak 13-18 yaş aralığı kabul edilir."}, {"id": 86, "u": 5, "q": "“Çok söyleme yüzsüz, çok dövme arsız edersin.” atasözü eğitim psikolojisindeki hangi kavramla açıklanır?", "o": ["Alışma (Duyarsızlaşma)", "Olgunlaşma", "Refleks", "İçgüdü"], "a": 0, "e": "Aynı uyarıcının sürekli tekrarlanması sonucunda bireyin uyarıcıya verdiği tepkinin azalmasına veya kaybolmasına 'alışma' denir."}, {"id": 87, "u": 5, "q": "Aşağıdakilerden hangisi doğuştan gelen bir refleks veya fizyolojik tepki olmayıp 'öğrenilmiş' bir davranıştır?", "o": ["Acıkma", "Göz kırpma", "Esnerken ağzını kapama", "Hapşırma"], "a": 2, "e": "Acıkma, göz kırpma ve hapşırma doğuştan/fizyolojiktir; esnerken ağzı kapama ise toplum içinde sonradan öğrenilmiş bir davranıştır."}, {"id": 88, "u": 5, "q": "Aşağıdakilerden hangisi öğrenme ile ilgili yanlış bir ifadedir?", "o": ["Öğrenme bir çevreye uyum sürecidir", "Öğrenme yaşantı ürünü bir davranış değişikliğidir", "Öğrenme tekrar ve deneyim sonucu oluşur", "Öğrenilmiş davranışların tamamı olumlu ve istendik yöndedir"], "a": 3, "e": "Öğrenilen her davranış olumlu olmak zorunda değildir (örneğin sigara içmek veya küfretmek de öğrenilmiş ama olumsuz davranışlardır)."}, {"id": 89, "u": 5, "q": "İnsanı belirli bir amaç için harekete geçiren içsel güce ne ad verilir?", "o": ["Empati", "Güdü (Motivasyon)", "Sempati", "Refleks"], "a": 1, "e": "Organizmayı belirli bir hedefe doğru harekete geçiren içsel güce 'güdü (motivasyon)' denir."}, {"id": 90, "u": 5, "q": "“Öğrenme ............... bir etkinliktir.” cümlesinde boşluğa gelmesi gereken en uygun kavram hangisidir?", "o": ["Ferdi (Bireysel)", "Mekanik", "Bölgesel", "Kurumsal"], "a": 0, "e": "Öğrenme bizzat bireyin kendi yaşantısıyla gerçekleştiği için ferdi (bireysel) bir etkinliktir."}, {"id": 91, "u": 5, "q": "Bireyin doğuştan getirdiği potansiyelin zaman içinde kendiliğinden ortaya çıkması ve vücut organlarının kendilerinden beklenen işi yapabilecek düzeye gelmesine ne denir?", "o": ["Olgunlaşma", "Koşullanma", "Alışma", "Ezberleme"], "a": 0, "e": "Öğrenme yaşantılarından bağımsız olarak biyolojik saatle gerçekleşen gelişime (örneğin parmak kaslarının kalem tutacak düzeye gelmesi) 'olgunlaşma' denir."}, {"id": 92, "u": 5, "q": "Aşağıdakilerden hangisi öğrenmeyi olumsuz yönde etkileyen durumlardan biridir?", "o": ["İyi havalandırılmış ve aydınlık bir eğitim ortamı", "Konunun öğrencinin ilgisini çekmesi", "Eğitim süresinin yetersiz olması veya ayrı mesleklerdekilere aynı eğitimin verilmesi", "Uygulamalı eğitim materyallerinin kullanılması"], "a": 2, "e": "Sürenin yetersiz olması ve farklı meslek gruplarına ihtiyaçlarına uymayan tek tip eğitim verilmesi öğrenmeyi olumsuz etkiler."}, {"id": 93, "u": 5, "q": "Önceden öğrenilen bir bilginin veya becerinin, yeni bir bilgi veya becerinin öğrenilmesini kolaylaştırmasına ne ad verilir?", "o": ["Olumlu aktarma (Pozitif transfer)", "Olumsuz aktarma (Ket vurma)", "Sönme", "Genelleme"], "a": 0, "e": "Eski öğrenmenin yeni öğrenmeyi kolaylaştırmasına (örneğin bisiklet süren birinin motosiklet sürmeyi kolay öğrenmesi) 'olumlu aktarma' denir."}, {"id": 94, "u": 6, "q": "Ustalık yeterliğini kazanmış; aday çırak, çırak, kalfa ve öğrencilerin iş yerindeki eğitiminden sorumlu, mesleki eğitim tekniklerini bilen ve uygulayan kişiye ne denir?", "o": ["Usta", "Kalfa", "Usta öğretici", "Bölüm şefi"], "a": 2, "e": "Tanım doğrudan 'Usta Öğretici'ye aittir."}, {"id": 95, "u": 6, "q": "Aşağıdakilerden hangisi işletmelerde uygulanan beceri öğretiminin 4 temel basamağından biri değildir?", "o": ["Hazırlık", "Takdim (Sunuş / Gösterme)", "Uygulama (Yaptırma)", "Gözetim"], "a": 3, "e": "Beceri öğretiminin 4 basamağı: 1) Hazırlık, 2) Takdim, 3) Uygulama, 4) Değerlendirmedir (Kontrol). Gözetim bu basamaklardan biri değildir."}, {"id": 96, "u": 6, "q": "Usta öğreticinin bir işi veya işlemi öğrencinin gözü önünde adım adım yaparak ve açıklayarak öğretmesi hangi öğretim yöntemidir?", "o": ["Gösteri (Demonstrasyon)", "Düz anlatım", "Tartışma", "Örnek olay"], "a": 0, "e": "Bir işlemin nasıl yapılacağını hem gösterip hem açıklayarak öğretme yöntemine 'gösteri (demonstrasyon)' denir."}, {"id": 97, "u": 6, "q": "Öğrenmede kalıcılık oranı aşağıdaki öğrenme durumlarının hangisinde en yüksektir?", "o": ["Yalnız işiterek", "Yaparak, yaşayarak ve söyleyerek", "Yalnız okuyarak", "Yalnız görerek"], "a": 1, "e": "Öğrenme piramidine göre en yüksek kalıcılık (%90) bireyin bizzat yaparak, yaşayarak ve açıklayarak katıldığı öğrenmededir."}, {"id": 98, "u": 6, "q": "Beceri öğretim metodunda 'yapma (uygulama) ve söyleme' şeklindeki aktif öğrenme biçiminde kalıcılık (öğrenme) oranı yaklaşık yüzde kaçtır?", "o": ["%20", "%30", "%50", "%90"], "a": 3, "e": "Yaparak ve söyleyerek öğrenmede kalıcılık oranı %90'dır."}, {"id": 99, "u": 6, "q": "Eğitim araştırmalarına göre bireyin yalnızca işiterek (dinleyerek) öğrendiği bilgilerin yaklaşık yüzde kaçı hafızada kalıcı olur?", "o": ["%20", "%50", "%70", "%90"], "a": 0, "e": "Yalnızca okunanların %10'u, işitilenlerin %20'si, görülenlerin %30'u, görülüp işitilenlerin %50'si, yapılıp söylenenlerin %90'ı kalıcı olur."}, {"id": 100, "u": 6, "q": "Öğrencilere sorular sorarak onları düşündüren ve verilen cevaplar üzerinden konuyu adım adım öğreten öğretim yöntemi hangisidir?", "o": ["Soru-cevap yöntemi", "Düz anlatım yöntemi", "Gezi-gözlem yöntemi", "Proje yöntemi"], "a": 0, "e": "Soru sorarak düşündürmeye ve geri bildirim almaya dayalı yönteme 'soru-cevap yöntemi' denir."}, {"id": 101, "u": 6, "q": "Beceri öğretiminin 2. basamağı olan 'Takdim (Sunuş)' aşamasında usta öğretici aşağıdakilerden hangisini yapar?", "o": ["Öğrenciyi işe ve ortama ısındırır", "İşlemi işlem basamaklarına göre kendisi göstererek ve açıklayarak yapar", "Öğrenciye işi tek başına yaptırır", "Öğrencinin ürettiği parçaya not verir"], "a": 1, "e": "Takdim basamağında usta öğretici işi bizzat kendisi adım adım gösterir ve niçin öyle yapıldığını açıklar."}, {"id": 102, "u": 6, "q": "Beceri öğretiminin 1. basamağı olan 'Hazırlık' aşamasında aşağıdakilerden hangisi yapılır?", "o": ["Araç-gereçler hazırlanır, öğrencinin ön bilgileri yoklanır ve öğrenci işe güdülenir", "Öğrenciye yazılı sınav yapılır", "Bitmiş ürün müşteriye teslim edilir", "Yıllık izin belgeleri imzalanır"], "a": 0, "e": "Hazırlık basamağında hem fiziksel çalışma ortamı/araçlar hazırlanır hem de öğrenci zihinsel olarak işe motive edilir."}, {"id": 103, "u": 6, "q": "Aşağıdakilerden hangisi mesleki öğretim yöntemlerinden biri değildir?", "o": ["Gösteri (Demonstrasyon)", "Sınıf anlatımı", "Soru-cevap", "Anlatım (Takrir)"], "a": 1, "e": "Literatürde anlatım, soru-cevap ve gösteri yöntemleri vardır; 'sınıf anlatımı' adında bir öğretim yöntemi yoktur."}, {"id": 104, "u": 6, "q": "Mesleki ve teknik eğitimde atölye ve işletmelerde beceri kazandırmak için en çok kullanılan öğretim metodu hangisidir?", "o": ["Düz anlatım metodu", "Müzakere metodu", "Gösterip yaptırma (Demonstrasyon) metodu", "Seminer metodu"], "a": 2, "e": "Mesleki beceri eğitiminde en etkili ve en çok kullanılan yöntem 'gösterip yaptırma' metodudur."}, {"id": 105, "u": 6, "q": "Bir işi meydana getiren başlıca hareketlerden (adımlardan) her birine ne ad verilir?", "o": ["İşlem basamağı", "Teknik bilgi", "Genel kültür", "Sentez"], "a": 0, "e": "Bir işin tamamlanması için sırasıyla yapılan temel hareketlerin her birine 'işlem basamağı' denir."}, {"id": 106, "u": 6, "q": "Bir bütünü, kendisini oluşturan alt parçalara ve işlem basamaklarına ayırma işlemine ne ad verilir?", "o": ["İşlem", "Analiz (Çözümleme)", "Birleştirme", "Karşılaştırma"], "a": 1, "e": "Bir bütünü kendisini oluşturan parçalara ayırma işlemine 'analiz' denir."}, {"id": 107, "u": 6, "q": "İş ve mesleklerin öğretilebilecek unsurlarını belirlemek amacıyla yapılan sistemli öğretim envanteri çalışmasına ne denir?", "o": ["Pazar analizi", "İş ve meslek analizi", "Maliyet muhasebesi", "Performans notu"], "a": 1, "e": "Bir mesleğin öğretilebilir işlem ve bilgi envanterini çıkarma çalışmasına 'iş ve meslek analizi' denir."}, {"id": 108, "u": 6, "q": "Meslek analizi yapılırken izlenecek ilk adım aşağıdakilerden hangisidir?", "o": ["Meslek ana bölümlere (işlere/görevlere) ayrılır", "Sınav soruları yazılır", "Kalfalık belgeleri dağıtılır", "Müşteri memnuniyet anketi yapılır"], "a": 0, "e": "Meslek analizinde önce meslek ana bölümlere (görevlere/işlere), sonra işlemlere ve işlem basamaklarına ayrılır."}, {"id": 109, "u": 6, "q": "Bir kişinin kazanç sağlamak amacıyla yaptığı, belirli seviyede bilgi, beceri ve iş alışkanlığı gerektiren sürekli faaliyetler bütününe ne denir?", "o": ["Meslek", "Hobi", "İşlem basamağı", "Deney"], "a": 0, "e": "Geçim sağlamak amacıyla yapılan ve eğitimle kazanılan sürekli faaliyetlere 'meslek' denir."}, {"id": 110, "u": 6, "q": "Aşağıdakilerden hangisi iş yerindeki usta öğreticinin görevlerinden biri değildir?", "o": ["Eğitim ve öğretim faaliyetlerini yürütmek", "Öğrencilerin becerilerini ölçmek ve değerlendirmek", "Eğitim ortamını organize etmek ve yönetmek", "İşletmenin vergi ve finans muhasebesini tutmak"], "a": 3, "e": "Usta öğreticinin görevi eğitim-öğretim, organizasyon ve ölçme-değerlendirmedir; muhasebe ve finans onun görevi değildir."}, {"id": 111, "u": 6, "q": "Öğrenilen konunun daha iyi pekiştirilmesi ve tekrar edilmesi için öğrencilere verilen bireysel çalışmalara ne ad verilir?", "o": ["Ödev", "Disiplin cezası", "Yoklama", "Sertifika"], "a": 0, "e": "Konuların pekiştirilmesi amacıyla verilen çalışmalara 'ödev' denir."}, {"id": 112, "u": 7, "q": "Bir meslek alanında öğrenme kazanımlarının kendi içinde bütünlüğü olan modüller hâlinde düzenlendiği programa ne ad verilir?", "o": ["Haftalık ders çizelgesi", "Yıllık plan", "Ders bilgi formu", "Modüler program"], "a": 3, "e": "Mesleki eğitimde kazanımların bağımsız öğrenme birimleri (modüller) halinde yapılandırıldığı programa 'modüler program' denir."}, {"id": 113, "u": 7, "q": "Millî Eğitim Bakanlığı mevzuatına göre bir eğitim-öğretim (ders) yılı kaç haftadan oluşur?", "o": ["32 hafta", "36 hafta", "40 hafta", "44 hafta"], "a": 1, "e": "Bir eğitim-öğretim yılı 36 haftadan oluşur; yıllık planlar 36 hafta üzerinden hazırlanır."}, {"id": 114, "u": 7, "q": "Mesleki ve teknik ortaöğretimde (ve MESEM'de) çerçeve öğretim programları kaç yıl olarak tasarlanır?", "o": ["1 yıl", "2 yıl", "3 yıl", "4 yıl"], "a": 3, "e": "Ortaöğretim kademesindeki çerçeve öğretim programları 9, 10, 11 ve 12. sınıfları kapsayacak şekilde 4 yıl olarak tasarlanır."}, {"id": 115, "u": 7, "q": "Mesleki eğitim merkezi (MESEM) programı uygulayan okul ve kurumlarda okutulan dersler içinde 'yıl sonu başarı puanı ile başarılı sayılamayacak' (baraj) ders hangisidir?", "o": ["Matematik", "İşletmelerde Mesleki Eğitim", "Türk Dili ve Edebiyatı", "Din Kültürü ve Ahlak Bilgisi"], "a": 1, "e": "İşletmelerde Mesleki Eğitim dersi doğrudan beceri eğitimi olduğu için yıl sonu puanı ortalamasıyla geçilemez; bu dersten başarılı olmak şarttır."}, {"id": 116, "u": 7, "q": "İşletmelerde uygulanacak yıllık beceri eğitim planında aşağıdaki bilgilerden hangisi yer almaz?", "o": ["Modül adı", "Ders saati / Süre", "Sınav soruları", "Ders adı ve kazanımlar"], "a": 2, "e": "Yıllık planda ders adı, modül adı, kazanımlar ve süreler yer alır; 'sınav soruları' yıllık planda bulunmaz."}, {"id": 117, "u": 7, "q": "İşletmelerde uygulanacak yıllık beceri eğitim planı kimler tarafından hazırlanır?", "o": ["Okuldaki alan/bölüm öğretmenleri tarafından", "Belediye zabıtası tarafından", "Öğrenci velileri tarafından", "Çırak öğrenciler tarafından"], "a": 0, "e": "İşletme yıllık planı, okuldaki alan/bölüm öğretmenleri tarafından (usta öğretici ve koordinatör öğretmenle iş birliği içinde) hazırlanır."}, {"id": 118, "u": 7, "q": "Mesleki ve teknik ortaöğretim haftalık ders çizelgelerinde aşağıdaki ders kategorilerinden hangisi bulunmaz?", "o": ["Ortak dersler", "Standart dersler", "Dal dersleri", "Alan dersleri"], "a": 1, "e": "Haftalık ders çizelgelerinde ortak dersler, alan dersleri ve dal dersleri bulunur; 'standart dersler' diye bir ders grubu yoktur."}, {"id": 119, "u": 7, "q": "Aşağıdakilerden hangisi işletmelerde yürütülen beceri eğitimi faaliyetlerinden biri olamaz?", "o": ["Günlük öğrenci çalışmalarını çizelge üzerinde belirlemek", "Kazanılan becerileri iş yapma testleri ile sınamak", "Güvenlik kural ve tedbirlerine uygun hareket etmek", "Araç ve gereçleri tertipli ve düzenli kullanmamak"], "a": 3, "e": "Araç ve gereçleri tertipli ve düzenli 'kullanmamak' beceri eğitimi ilkelerine aykırıdır."}, {"id": 120, "u": 7, "q": "Öğrencinin işletmede yaptığı uygulamalı çalışmaları, resimleri ve işlem yapraklarını derlediği dosyaya ne ad verilir?", "o": ["İş ve işlem dosyası (Portfolyo)", "Sicil dosyası", "Vergi levhası", "İhale dosyası"], "a": 0, "e": "Öğrencinin yıl boyunca işletmede yaptığı mesleki çalışmaları topladığı dosyaya 'iş dosyası' denir."}, {"id": 121, "u": 7, "q": "Okul ile işletme arasındaki koordinasyonu sağlayan ve öğrencilerin işletmedeki eğitimini rehberlik ederek denetleyen öğretmene ne denir?", "o": ["Koordinatör öğretmen", "Nöbetçi öğretmen", "Sınıf rehber öğretmeni", "Müfettiş"], "a": 0, "e": "İşletmelerdeki mesleki eğitimi planlamak, izlemek ve rehberlik yapmak üzere görevlendirilen öğretmene 'koordinatör öğretmen' denir."}, {"id": 122, "u": 7, "q": "Modüler öğretim programında her bir modülün sonunda öğrencinin o modülün kazanımlarına ulaşıp ulaşmadığını belirlemek için yapılan işleme ne denir?", "o": ["Modül değerlendirmesi", "Kayıt kabul", "Mezuniyet töreni", "Nakil işlemi"], "a": 0, "e": "Her modül tamamlandığında öğrencinin başarısını ölçmek için modül değerlendirmesi yapılır."}, {"id": 123, "u": 7, "q": "Mesleki eğitimde 'alan' ve 'dal' kavramları arasındaki ilişki nasıldır?", "o": ["Alan genel meslek grubunu, dal ise o alanın alt uzmanlık branşını ifade eder", "Dal genel grubu, alan alt branşı ifade eder", "İkisi de teorik ortak ders demektir", "İkisi de sadece üniversitede kullanılır"], "a": 0, "e": "Örneğin 'Güzellik ve Saç Bakım Hizmetleri' bir alan; onun altındaki 'Cilt Bakımı' veya 'Erkek Kuaförlüğü' ise birer daldır."}, {"id": 124, "u": 7, "q": "İşletmelerde mesleki eğitim gören öğrencilerin devamsızlık takibi kimin iş birliğiyle yapılır?", "o": ["İşletme yetkilisi / usta öğretici ve koordinatör öğretmen (okul müdürlüğü)", "Sadece mahalle muhtarı", "Sadece diğer çıraklar", "Müşteriler"], "a": 0, "e": "Öğrencinin işletmedeki devam-devamsızlık kayıtları işveren/usta öğretici tarafından tutulur ve okul müdürlüğüne/koordinatör öğretmene bildirilir."}, {"id": 125, "u": 8, "q": "Bir işletmenin mal ve hizmetlerinin diğer işletmelerin mal ve hizmetlerinden ayırt edilmesini sağlayan her türlü işarete ne ad verilir?", "o": ["Marka", "Patent", "Faydalı model", "TSE belgesi"], "a": 0, "e": "Mal veya hizmetleri diğerlerinden ayırt etmeye yarayan isim, sembol veya işaretlere 'marka' denir."}, {"id": 126, "u": 8, "q": "Buluş sahibine, buluş konusu ürünü belirli bir süre üretme, kullanma, satma ve ihraç etme hakkı veren sınai mülkiyet belgesi hangisidir?", "o": ["Marka tescili", "Patent", "Telif hakkı", "İş yeri ruhsatı"], "a": 1, "e": "Teknik bir buluşun sahibine verilen süreli üretim ve satış tekel hakkı belgesine 'patent' denir."}, {"id": 127, "u": 8, "q": "Belirli bir amaca ulaşmak veya bir malı üretmek için katlanılan fedakârlıkların parasal tutarına ne ad verilir?", "o": ["Fayda", "Kâr", "Verim", "Maliyet"], "a": 3, "e": "Bir mal veya hizmetin üretimi için yapılan tüm harcamaların ve katlanılan fedakârlıkların parasal toplamına 'maliyet' denir."}, {"id": 128, "u": 8, "q": "Ekonomi ve işletme yönetiminde 'Verimlilik' aşağıdakilerden hangisiyle tanımlanır?", "o": ["Toplam çalışan sayısıyla", "Elde edilen çıktının (üretimin) kullanılan girdiye (kaynağa) oranıyla", "Ürünün sadece reklam bütçesiyle", "İş yerinin metrekaresiyle"], "a": 1, "e": "Verimlilik = Çıktı ÷ Girdi oranıdır; kaynakları israf etmeden en yüksek çıktıyı elde etmeyi ifade eder."}, {"id": 129, "u": 8, "q": "Aşağıdakilerden hangisi kalite ve verimliliğin ekonomiye ve işletmeye sağladığı faydalardandır?", "o": ["Birim maliyeti düşürmesi", "İşletmenin rekabet gücünü geliştirmesi", "Kaynak israfını önlemesi", "Hepsi"], "a": 3, "e": "Kalite ve verimlilik; maliyeti düşürür, israfı önler ve rekabet gücünü artırır."}, {"id": 130, "u": 8, "q": "Bir işletmede hedeflenen kalitenin gerçekleşmesi için sürdürülen planlı faaliyetlerin tamamına ne ad verilir?", "o": ["Personel işe alımı", "Mali tahsilat", "Kalite yönetim sistemleri", "Arşivleme"], "a": 2, "e": "İşletmede kalite politikasını ve hedeflerini gerçekleştirmek için yürütülen faaliyetlerin bütününe 'Kalite Yönetim Sistemleri' denir."}, {"id": 131, "u": 8, "q": "Kaliteli üretim anlayışı aşağıdakilerden hangisini sağlamaz?", "o": ["Müşteri memnuniyeti", "Gereksiz kaynak kullanımı ve israf", "Üretimde hatasızlık", "Güvenli ve standartlara uygun ürün"], "a": 1, "e": "Kalite; müşteri memnuniyeti, hatasızlık ve güvenli ürün sağlar, 'gereksiz kullanım' sağlamaz."}, {"id": 132, "u": 8, "q": "Aşağıdakilerden hangisi iş yerinde çalışmayı engelleyen ve kaliteyi olumsuz etkileyen sebeplerdendir?", "o": ["İyi yönetim ve doğru planlama", "Çalışanlara eşit ve adil muamele", "Çalışanların yeteneklerine uygun işlerde görevlendirilmesi", "İyi olmayan (güvensiz ve düzensiz) çalışma ortamı"], "a": 3, "e": "Kötü, düzensiz ve güvensiz çalışma ortamı hem iş verimini hem de ürün/hizmet kalitesini düşürür."}, {"id": 133, "u": 8, "q": "Belirli bir yöre, alan veya bölge ile özdeşleşmiş, kalitesi veya ünü bu coğrafi kökenden kaynaklanan ürünleri koruyan işaret hangisidir?", "o": ["Coğrafi işaret (Örn: Kayseri Pastırması, Antep Baklavası)", "Barkod", "Patent", "Fatura"], "a": 0, "e": "Yöreyle özdeşleşmiş geleneksel ve yerel ürünleri koruyan tescile 'coğrafi işaret' denir."}, {"id": 134, "u": 8, "q": "Sürekli bir üretim sistemi planlanırken aşağıdakilerden hangisi yapılmalıdır?", "o": ["Üretim miktarı belirlenir", "Talep tahminleri yapılır", "Üretim zaman aralığı tespit edilir", "Hepsi"], "a": 3, "e": "Üretim planlamasında talep tahmini, üretim miktarı ve zaman planlamasının tamamı yapılır."}, {"id": 135, "u": 8, "q": "Aşağıdakilerden hangisi doğrudan bir 'üretim (imalat)' mesleği olmayıp onarım/hizmet ağırlıklıdır?", "o": ["Mobilya imalatçılığı", "Kuyumculuk (Takı imalatı)", "Tamircilik (Bakım-onarım)", "Tornacılık"], "a": 2, "e": "Tamircilik mevcut bir ürünü onarma (hizmet) faaliyetidir; mobilyacılık, kuyumculuk ve tornacılık imalat/üretim ağırlıklıdır."}, {"id": 136, "u": 8, "q": "Türkiye'de standartları hazırlamak ve ürün/hizmetlerin standartlara uygunluğunu belgelendirmekle görevli resmî kurum hangisidir?", "o": ["Türk Standardları Enstitüsü (TSE)", "Merkez Bankası", "Tapu ve Kadastro Genel Müdürlüğü", "Devlet Tiyatroları"], "a": 0, "e": "Ülkemizde standartları belirleyen ve belgelendiren kurum Türk Standardları Enstitüsü'dür (TSE)."}, {"id": 137, "u": 8, "q": "Bir işletmede 'Toplam Kalite Yönetimi (TKY)' anlayışının temelinde aşağıdakilerden hangisi yer alır?", "o": ["Kaliteye tüm çalışanların katılımı ve sürekli iyileştirme (Kaizen)", "Sadece genel müdürün çalışması", "Hataları müşteriden gizlemek", "Eğitimi tamamen kaldırmak"], "a": 0, "e": "Toplam Kalite Yönetimi; üst yönetimden en alt çalışana kadar herkesin katılımını, müşteri odaklılığı ve sürekli iyileştirmeyi esas alır."}, {"id": 138, "u": 9, "q": "Bir özelliğin gözlenip gözlem sonuçlarının sayı ya da sembollerle ifade edilmesine ne ad verilir?", "o": ["Ölçme", "Değerlendirme", "Ölçüt", "Geçerlik"], "a": 0, "e": "Bilinmeyen bir değeri kendi cinsinden bir birimle mukayese edip sayı veya sembolle ifade etme işlemine 'ölçme' denir."}, {"id": 139, "u": 9, "q": "Ölçme sonuçlarının bir ölçütle (kriterle) karşılaştırılarak bir değer yargısına veya karara varılması işlemine ne ad verilir?", "o": ["Ölçme", "Birim", "Test", "Değerlendirme"], "a": 3, "e": "Ölçme sonucunu bir ölçütle karşılaştırıp 'geçti/kaldı, başarılı/başarısız' gibi karara varmaya 'değerlendirme' denir."}, {"id": 140, "u": 9, "q": "Derste anlatılmayan (işlenmeyen) konuların sınavda sorulması, ölçme aracının hangi temel niteliğini bozar?", "o": ["Güvenirlik", "Geçerlik (Kapsam geçerliği)", "Kullanışlılık", "Birim"], "a": 1, "e": "Sınavın işlenen konuları dengeli temsil etmemesi veya işlenmeyen konuları içermesi 'kapsam geçerliğini' düşürür."}, {"id": 141, "u": 9, "q": "Öğrencinin bir mesleki işi veya işlemi fiilen yapabilme becerisini ölçmek için en uygun ölçme aracı hangisidir?", "o": ["Çoktan seçmeli test", "Sözlü yoklama", "Performans (İş yapma) testi", "Doğru-Yanlış testi"], "a": 2, "e": "Psikomotor (uygulamalı) mesleki becerileri ölçmenin en geçerli yolu 'performans (iş yapma) testi'dir."}, {"id": 142, "u": 9, "q": "“Ölçmeye konu olan özelliğin hangi miktarına ne değer (puan) verileceğinin belirlenmesidir.” Bu cümlede söz edilen kavram hangisidir?", "o": ["Birim", "Ölçüt", "Geçerlik", "Ölçme kuralı"], "a": 3, "e": "Sınavda hangi soruya veya işlem basamağına kaç puan verileceğini belirten kurala 'ölçme kuralı' denir."}, {"id": 143, "u": 9, "q": "Eğitime tabi tutulan çırakların davranışlarında oluşması gereken gelişimlerin ve değişikliklerin ölçülmesi hangi ölçme çeşidine girer?", "o": ["Eğitsel ölçme", "Jeolojik ölçme", "Meteorolojik ölçme", "Astronomik ölçme"], "a": 0, "e": "Eğitim sürecindeki öğrenci davranış değişikliklerinin ölçülmesine 'eğitsel ölçme' denir."}, {"id": 144, "u": 9, "q": "Yanıtlayıcının soruların yanıtlarını düşünüp hatırlayarak ve kendi cümleleriyle organize edip yazılı olarak sunduğu sınav türü hangisidir?", "o": ["Çoktan seçmeli test", "Yazılı sınav (Klasik açık uçlu yoklama)", "Eşleştirme testi", "Sözlü sınav"], "a": 1, "e": "Öğrencinin cevabı kendi cümleleriyle organize edip kağıda yazdığı sınav türü 'yazılı sınav'dır."}, {"id": 145, "u": 9, "q": "Aşağıdakilerden hangisi eğitimde ölçme ve değerlendirmenin sağladığı faydalardan biri değildir?", "o": ["Eğitim süreçlerinin verimliliğinin kontrol edilmesi", "Öğrencinin öğrenme eksikliklerinin tespit edilmesi", "Eğiticinin (usta öğreticinin) mesleki unvanını kendiliğinden değiştirmesi", "Öğrenciye doğru ve etkili geri bildirim verilmesi"], "a": 2, "e": "Ölçme ve değerlendirme öğrenci başarısını ve eğitim verimliliğini ölçer; eğiticinin mesleki yeterliliğini/unvanını doğrudan artırmaz."}, {"id": 146, "u": 9, "q": "Bir ölçme aracının (sınavın) tesadüfi hatalardan arınık olması ve tekrarlanan ölçümlerde kararlı, tutarlı sonuçlar vermesi hangi özelliğidir?", "o": ["Güvenirlik", "Kullanışlılık", "Ekonomiklik", "Görünüş"], "a": 0, "e": "Ölçme aracının hatalardan arınık, duyarlı ve tutarlı sonuçlar vermesine 'güvenirlik' denir."}, {"id": 147, "u": 9, "q": "Bir sınavın hazırlanması, uygulanması ve puanlanmasının kolay, pratik ve ekonomik olması ölçme aracının hangi özelliğidir?", "o": ["Kullanışlılık", "Geçerlik", "Güvenirlik", "Zorluk"], "a": 0, "e": "Ölçme aracının zaman, emek ve maliyet açısından ekonomik ve pratik olmasına 'kullanışlılık' denir."}, {"id": 148, "u": 9, "q": "Usta öğreticilik e-Sınavında '50 puan alan aday başarılı sayılır' kuralındaki '50 puan' ölçme ve değerlendirmedeki hangi kavrama örnektir?", "o": ["Ölçüt (Kriter / Geçme barajı)", "Ölçme aracı", "Fiziksel birim", "Gürültü"], "a": 0, "e": "Ölçme sonuçlarının karşılaştırıldığı ve karar vermeye dayanak olan sınır değere (50 puan) 'ölçüt' denir."}, {"id": 149, "u": 9, "q": "Adayın çok sayıda soruyu kısa sürede yanıtlayabildiği, puanlaması objektif olan ve şans başarısı (tahminle doğru bulma) ihtimali bulunan test türü hangisidir?", "o": ["Çoktan seçmeli test", "Sözlü sınav", "Performans testi", "Mülakat"], "a": 0, "e": "MEB e-Sınavlarında da kullanılan çoktan seçmeli testler objektif puanlanır ve kapsam geçerliği yüksektir."}, {"id": 150, "u": 9, "q": "İşletmelerde beceri eğitimi gören öğrencinin yaptığı işin 'kabul edilebilir kalite ve sürede' olup olmadığını adım adım puanlamak için kullanılan çizelgeye ne denir?", "o": ["Gözlem / Derecelendirme ölçeği (Kontrol listesi)", "Haftalık ders programı", "Yıllık izin formu", "Nüfus kayıt örneği"], "a": 0, "e": "Uygulamalı beceri sınavlarında her işlem basamağının yapılıp yapılmadığını puanlamak için 'kontrol listesi / derecelendirme ölçeği' kullanılır."}];
+    const EXAMS_CONFIG = [{"id": "deneme-1", "num": 1, "title": "1. Deneme Sınavı: 9 Öğrenme Birimi Temel Kazanım Sınavı", "subtitle": "MEB İş Pedagojisi Kurs Programı'ndaki 9 modülün temel kavramları ve kanun maddeleri", "badge": "Temel & Orta Seviye", "indices": [0, 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132, 135, 138, 141, 144, 147]}, {"id": "deneme-2", "num": 2, "title": "2. Deneme Sınavı: YouTube Ders Videoları ve Çıkmış Sorular", "subtitle": "MESEM çalışma sorularında ve eğitim videolarında en sık çıkan 50 soru", "badge": "Çıkmış Soru Odaklı", "indices": [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55, 58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91, 94, 97, 100, 103, 106, 109, 112, 115, 118, 121, 124, 127, 130, 133, 136, 139, 142, 145, 148]}, {"id": "deneme-3", "num": 3, "title": "3. Deneme Sınavı: Uygulama, İSG ve Pedagoji Sınavı", "subtitle": "Beceri öğretimi, iş güvenliği, iletişim, kalite ve ölçme-değerlendirme ağırlıklı", "badge": "Uygulama Odaklı", "indices": [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98, 101, 104, 107, 110, 113, 116, 119, 122, 125, 128, 131, 134, 137, 140, 143, 146, 149]}, {"id": "deneme-4", "num": 4, "title": "4. Deneme Sınavı: Kritik Rakamlar ve Çeldirici Sorular", "subtitle": "3308 sayılı Kanun süreleri, oranlar ve 'değildir / olamaz' kalıplı seçici sorular", "badge": "İleri Seviye", "indices": [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140, 145, 2, 7, 12, 17, 22, 27, 32, 37, 42, 47, 52, 57, 62, 67, 72, 77, 82, 87, 92, 97]}, {"id": "deneme-5", "num": 5, "title": "5. Deneme Sınavı: Türkiye Geneli e-Sınav Son Prova", "subtitle": "Gerçek MEB e-Sınav merkezindeki sınav öncesi tüm konuların genel taraması", "badge": "Genel Son Prova", "indices": [1, 6, 11, 16, 21, 26, 31, 36, 41, 46, 51, 56, 61, 66, 71, 76, 81, 86, 91, 96, 101, 106, 111, 116, 121, 126, 131, 136, 141, 146, 3, 8, 13, 18, 23, 28, 33, 38, 43, 48, 53, 58, 63, 68, 73, 78, 83, 88, 93, 98]}];
+
+    // =========================================================================
+    // APPLICATION STATE & SAFE LOCALSTORAGE WRAPPER
+    // =========================================================================
+    const STORAGE_KEY = "meb_usta_ogretici_esinav_v1";
+
+    let appState = {
+      candidateName: "",
+      instantFeedback: false,
+      history: {}, // examId -> { score, correct, wrong, empty, date, answers }
+      activeExam: null // { id, title, questions: [], answers: {}, flags: {}, currentIndex: 0, remainingSec: 2700, timerId: null }
+    };
+
+    function loadPersistedState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === "object") {
+            appState.candidateName = parsed.candidateName || "";
+            appState.instantFeedback = Boolean(parsed.instantFeedback);
+            appState.history = parsed.history || {};
+          }
+        }
+      } catch (e) {
+        // Ignore storage errors in sandboxed iframes
+      }
+    }
+
+    function savePersistedState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          candidateName: appState.candidateName,
+          instantFeedback: appState.instantFeedback,
+          history: appState.history
+        }));
+      } catch (e) {
+        // Ignore storage errors
+      }
+    }
+
+    // =========================================================================
+    // UI HELPERS (Toast, Modal, Clipboard, View Switcher)
+    // =========================================================================
+    let toastTimer = null;
+    function showToast(message, icon = "✅") {
+      const box = document.getElementById("toast-box");
+      const ic = document.getElementById("toast-icon");
+      const txt = document.getElementById("toast-text");
+      ic.textContent = icon;
+      txt.textContent = message;
+      box.classList.remove("hidden");
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        box.classList.add("hidden");
+      }, 3200);
+    }
+
+    function copyTextToClipboard(text, successMsg) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast(successMsg, "🔗");
+        }).catch(() => {
+          fallbackCopy(text, successMsg);
+        });
+      } else {
+        fallbackCopy(text, successMsg);
+      }
+    }
+
+    function fallbackCopy(text, successMsg) {
+      try {
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast(successMsg, "🔗");
+      } catch (e) {
+        showToast("Link kopyalanamadı, adres çubuğundan kopyalayabilirsiniz.", "ℹ️");
+      }
+    }
+
+    let modalConfirmCallback = null;
+    function openConfirmModal(title, desc, confirmLabel, onConfirm) {
+      document.getElementById("modal-title").textContent = title;
+      document.getElementById("modal-desc").textContent = desc;
+      document.getElementById("modal-confirm-btn").textContent = confirmLabel;
+      modalConfirmCallback = onConfirm;
+      document.getElementById("confirm-modal").classList.remove("hidden");
+    }
+
+    function closeConfirmModal() {
+      document.getElementById("confirm-modal").classList.add("hidden");
+      modalConfirmCallback = null;
+    }
+
+    function switchView(viewName) {
+      const views = ["home", "exam", "result", "pool", "deploy"];
+      views.forEach(v => {
+        const el = document.getElementById("view-" + v);
+        if (el) {
+          if (v === viewName) {
+            el.classList.remove("hidden");
+          } else {
+            el.classList.add("hidden");
+          }
+        }
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // =========================================================================
+    // DASHBOARD (HOME) RENDERING
+    // =========================================================================
+    function renderDashboard() {
+      document.getElementById("candidate-name-input").value = appState.candidateName;
+      document.getElementById("instant-feedback-toggle").checked = appState.instantFeedback;
+
+      // Calculate stats
+      const historyValues = Object.values(appState.history);
+      const completedCount = historyValues.length;
+      document.getElementById("stat-completed-count").textContent = completedCount + " / 6 Sınav";
+
+      if (completedCount > 0) {
+        const avg = Math.round(historyValues.reduce((acc, h) => acc + h.score, 0) / completedCount);
+        document.getElementById("stat-avg-score").textContent = avg + " Puan";
+      } else {
+        document.getElementById("stat-avg-score").textContent = "—";
+      }
+
+      // Render 5 fixed exams + 1 dynamic random exam card
+      const grid = document.getElementById("exams-grid");
+      grid.innerHTML = "";
+
+      const allCards = [
+        ...EXAMS_CONFIG,
+        {
+          id: "deneme-rastgele",
+          num: 6,
+          title: "Dinamik Karma Sınav (Havuzdan Rastgele 50 Soru)",
+          subtitle: "150 soruluk havuzdan her girişte 9 öğrenme birimine göre dengeli yeni 50 soru seçer",
+          badge: "Sınırsız Pratik",
+          isRandom: true
+        }
+      ];
+
+      allCards.forEach(exam => {
+        const hist = appState.history[exam.id];
+        const card = document.createElement("div");
+        card.className = "bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col justify-between hover:border-blue-400 transition";
+
+        let histBadgeHtml = `<span class="text-xs font-semibold text-slate-400">Henüz Çözülmedi</span>`;
+        if (hist) {
+          const passed = hist.score >= 50;
+          const colorCls = passed ? "bg-emerald-100 text-emerald-800 border-emerald-300" : "bg-rose-100 text-rose-800 border-rose-300";
+          histBadgeHtml = `<span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full border ${colorCls}">Son Puan: ${hist.score} (${hist.correct}D / ${hist.wrong}Y)</span>`;
+        }
+
+        const badgeColor = exam.isRandom
+          ? "bg-purple-100 text-purple-800"
+          : "bg-blue-50 text-blue-800";
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="px-2.5 py-1 rounded-lg text-xs font-extrabold ${badgeColor}">${exam.badge}</span>
+              ${histBadgeHtml}
+            </div>
+            <h4 class="font-extrabold text-base text-slate-900 mb-1.5 leading-snug">${exam.title}</h4>
+            <p class="text-xs text-slate-600 leading-relaxed mb-4">${exam.subtitle}</p>
+          </div>
+          <div>
+            <div class="flex items-center justify-between text-[11px] text-slate-500 font-semibold border-t border-slate-100 pt-3 mb-3">
+              <span>📋 50 Çoktan Seçmeli Soru</span>
+              <span>⏱️ 45 Dakika</span>
+              <span>🎯 Baraj: 50</span>
+            </div>
+            <button type="button" data-start-exam="${exam.id}" class="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm ${exam.isRandom ? 'bg-purple-700 hover:bg-purple-800' : 'bg-blue-700 hover:bg-blue-800'} text-white shadow-sm transition flex items-center justify-center gap-2">
+              <span>▶</span> <span>${hist ? 'Sınavı Yeniden Başlat' : 'e-Sınavı Başlat'}</span>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      // Attach listeners to start buttons
+      grid.querySelectorAll("[data-start-exam]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const examId = btn.getAttribute("data-start-exam");
+          startExam(examId);
+        });
+      });
+    }
+
+    // =========================================================================
+    // EXAM ENGINE (START, RENDER QUESTION, TIMER, FINISH)
+    // =========================================================================
+    function buildRandomBalancedIndices() {
+      // Pick questions proportionally across the 9 units totaling 50
+      const quotas = { 1: 9, 2: 5, 3: 6, 4: 5, 5: 6, 6: 6, 7: 5, 8: 4, 9: 4 };
+      const chosen = [];
+      Object.keys(quotas).forEach(uKey => {
+        const u = parseInt(uKey, 10);
+        const candidates = QUESTION_POOL.map((q, idx) => ({ q, idx })).filter(item => item.q.u === u);
+        // Shuffle candidates
+        for (let i = candidates.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          const temp = candidates[i];
+          candidates[i] = candidates[j];
+          candidates[j] = temp;
+        }
+        candidates.slice(0, quotas[u]).forEach(c => chosen.push(c.idx));
+      });
+      return chosen;
+    }
+
+    function startExam(examId) {
+      // Sync candidate name input if filled
+      const nameInput = document.getElementById("candidate-name-input");
+      if (nameInput && nameInput.value.trim()) {
+        appState.candidateName = nameInput.value.trim();
+        savePersistedState();
+      }
+
+      if (appState.activeExam && appState.activeExam.timerId) {
+        clearInterval(appState.activeExam.timerId);
+      }
+
+      let examMeta = EXAMS_CONFIG.find(e => e.id === examId);
+      let indices = [];
+      let title = "";
+
+      if (examMeta) {
+        indices = examMeta.indices.slice();
+        title = examMeta.title;
+      } else {
+        indices = buildRandomBalancedIndices();
+        title = "Dinamik Karma Deneme Sınavı (50 Soru)";
+      }
+
+      const questions = indices.map(idx => QUESTION_POOL[idx]);
+
+      appState.activeExam = {
+        id: examId,
+        title: title,
+        questions: questions,
+        answers: {}, // index 0..49 -> 0..3
+        flags: {},   // index 0..49 -> boolean
+        currentIndex: 0,
+        remainingSec: 45 * 60,
+        timerId: null
+      };
+
+      document.getElementById("exam-header-title").textContent = title;
+      document.getElementById("exam-candidate-display").textContent = appState.candidateName || "Misafir Aday";
+
+      appState.activeExam.timerId = setInterval(() => {
+        if (!appState.activeExam) return;
+        appState.activeExam.remainingSec--;
+        updateTimerDisplay();
+        if (appState.activeExam.remainingSec <= 0) {
+          clearInterval(appState.activeExam.timerId);
+          showToast("Sınav süreniz (45 dakika) tamamlandı. Sonuçlarınız hesaplanıyor.", "⏰");
+          finalizeExam();
+        }
+      }, 1000);
+
+      updateTimerDisplay();
+      renderActiveQuestion();
+      renderPalette();
+      switchView("exam");
+    }
+
+    function updateTimerDisplay() {
+      if (!appState.activeExam) return;
+      const sec = Math.max(0, appState.activeExam.remainingSec);
+      const m = Math.floor(sec / 60);
+      const s = sec % 60;
+      const formatted = String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+      const el = document.getElementById("exam-timer-display");
+      el.textContent = formatted;
+      if (sec < 300) {
+        el.classList.add("text-rose-400");
+      } else {
+        el.classList.remove("text-rose-400");
+      }
+    }
+
+    function renderActiveQuestion() {
+      const ex = appState.activeExam;
+      if (!ex) return;
+
+      const idx = ex.currentIndex;
+      const qObj = ex.questions[idx];
+      const unitName = UNITS[qObj.u] || "İş Pedagojisi";
+
+      document.getElementById("exam-current-q-badge").textContent = (idx + 1) + "/50";
+      document.getElementById("exam-unit-display").textContent = unitName;
+      document.getElementById("q-number-pill").textContent = "Soru " + (idx + 1);
+      document.getElementById("q-unit-pill").textContent = unitName;
+      document.getElementById("question-stem-text").textContent = qObj.q;
+
+      // Update flag button appearance
+      const isFlagged = Boolean(ex.flags[idx]);
+      const flagBtn = document.getElementById("flag-question-btn");
+      const flagText = document.getElementById("flag-text");
+      if (isFlagged) {
+        flagBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold border border-amber-500 bg-amber-100 text-amber-900 transition flex items-center gap-1.5";
+        flagText.textContent = "İşaretlendi (Sonra Bak)";
+      } else {
+        flagBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-300 text-slate-700 hover:bg-amber-50 transition flex items-center gap-1.5";
+        flagText.textContent = "Sonra Bak İşaretle";
+      }
+
+      // Render options A, B, C, D
+      const letters = ["A", "B", "C", "D"];
+      const optContainer = document.getElementById("options-container");
+      optContainer.innerHTML = "";
+      const selectedOpt = ex.answers[idx];
+
+      qObj.o.forEach((optText, oIdx) => {
+        const isSelected = selectedOpt === oIdx;
+        const btn = document.createElement("button");
+        btn.type = "button";
+
+        let borderCls = "border-slate-200 bg-slate-50/70";
+        if (isSelected) {
+          borderCls = "opt-selected";
+        }
+
+        // If instant feedback mode is on and user answered
+        if (appState.instantFeedback && selectedOpt !== undefined) {
+          if (oIdx === qObj.a) {
+            borderCls = "border-emerald-600 bg-emerald-50 ring-2 ring-emerald-500/20";
+          } else if (isSelected && oIdx !== qObj.a) {
+            borderCls = "border-rose-600 bg-rose-50 ring-2 ring-rose-500/20";
+          }
+        }
+
+        btn.className = `opt-card w-full text-left p-3.5 sm:p-4 rounded-xl border-2 ${borderCls} flex items-start gap-3.5`;
+        btn.innerHTML = `
+          <span class="w-7 h-7 rounded-lg flex-shrink-0 flex items-center justify-center font-extrabold text-xs sm:text-sm ${isSelected ? 'bg-blue-700 text-white' : 'bg-white border border-slate-300 text-slate-700'}">
+            ${letters[oIdx]}
+          </span>
+          <span class="text-sm sm:text-base font-medium text-slate-800 leading-snug pt-0.5">${optText}</span>
+        `;
+
+        btn.addEventListener("click", () => {
+          ex.answers[idx] = oIdx;
+          renderActiveQuestion();
+          renderPalette();
+        });
+
+        optContainer.appendChild(btn);
+      });
+
+      // Instant feedback explanation box
+      const expBox = document.getElementById("instant-exp-box");
+      if (appState.instantFeedback && selectedOpt !== undefined) {
+        const isCorrect = selectedOpt === qObj.a;
+        expBox.className = isCorrect
+          ? "mt-5 p-4 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-950 text-sm leading-relaxed"
+          : "mt-5 p-4 rounded-xl border border-rose-300 bg-rose-50 text-rose-950 text-sm leading-relaxed";
+        expBox.innerHTML = `
+          <div class="font-extrabold mb-1">${isCorrect ? '✅ Doğru Yanıt!' : '❌ Yanlış Yanıt — Doğru Seçenek: ' + letters[qObj.a]}</div>
+          <div>${qObj.e}</div>
+        `;
+      } else {
+        expBox.className = "hidden";
+      }
+
+      // Prev / Next button states
+      document.getElementById("prev-question-btn").disabled = (idx === 0);
+      const nextLabel = document.getElementById("next-btn-label");
+      if (idx === ex.questions.length - 1) {
+        nextLabel.textContent = "Sınavı Bitir";
+      } else {
+        nextLabel.textContent = "Sonraki Soru";
+      }
+    }
+
+    function renderPalette() {
+      const ex = appState.activeExam;
+      if (!ex) return;
+
+      const answeredCount = Object.keys(ex.answers).length;
+      document.getElementById("palette-answered-count").textContent = answeredCount + " / 50 Yanıtlandı";
+
+      const grid = document.getElementById("question-palette-grid");
+      grid.innerHTML = "";
+
+      for (let i = 0; i < ex.questions.length; i++) {
+        const isCurrent = (i === ex.currentIndex);
+        const isAnswered = (ex.answers[i] !== undefined);
+        const isFlagged = Boolean(ex.flags[i]);
+
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = String(i + 1);
+
+        let cls = "bg-slate-100 text-slate-700 border border-slate-300";
+        if (isAnswered) {
+          cls = "bg-blue-700 text-white border border-blue-800";
+        }
+        if (isFlagged) {
+          cls = "bg-amber-400 text-slate-950 border border-amber-500 font-extrabold";
+        }
+        if (isCurrent) {
+          cls += " ring-2 ring-offset-1 ring-slate-900 font-extrabold";
+        }
+
+        btn.className = `q-grid-btn h-8 rounded-lg text-xs font-bold flex items-center justify-center ${cls}`;
+        btn.addEventListener("click", () => {
+          ex.currentIndex = i;
+          renderActiveQuestion();
+          renderPalette();
+        });
+        grid.appendChild(btn);
+      }
+    }
+
+    function promptFinishExam() {
+      const ex = appState.activeExam;
+      if (!ex) return;
+      const answeredCount = Object.keys(ex.answers).length;
+      const emptyCount = ex.questions.length - answeredCount;
+      const flaggedCount = Object.values(ex.flags).filter(Boolean).length;
+
+      let msg = `Toplam 50 sorudan ${answeredCount} tanesini yanıtladınız.`;
+      if (emptyCount > 0) {
+        msg += ` Henüz boş bıraktığınız ${emptyCount} soru var (Sınavda yanlışlar doğruyu götürmez!).`;
+      }
+      if (flaggedCount > 0) {
+        msg += ` Ayrıca 'Sonra Bak' olarak işaretlediğiniz ${flaggedCount} soru bulunuyor.`;
+      }
+      msg += " Sınavı şimdi bitirip sonuç karnenizi görmek istiyor musunuz?";
+
+      openConfirmModal("Sınavı Bitirmek İstiyor musunuz?", msg, "Sınavı Bitir ve Sonucu Gör", () => {
+        closeConfirmModal();
+        finalizeExam();
+      });
+    }
+
+    function finalizeExam() {
+      const ex = appState.activeExam;
+      if (!ex) return;
+      if (ex.timerId) {
+        clearInterval(ex.timerId);
+        ex.timerId = null;
+      }
+
+      let correct = 0;
+      let wrong = 0;
+      let empty = 0;
+
+      const unitStats = {};
+      Object.keys(UNITS).forEach(u => {
+        unitStats[u] = { total: 0, correct: 0 };
+      });
+
+      ex.questions.forEach((qObj, idx) => {
+        unitStats[qObj.u].total++;
+        const userAns = ex.answers[idx];
+        if (userAns === undefined) {
+          empty++;
+        } else if (userAns === qObj.a) {
+          correct++;
+          unitStats[qObj.u].correct++;
+        } else {
+          wrong++;
+        }
+      });
+
+      const score = correct * 2;
+      const passed = score >= 50;
+
+      // Save in history
+      appState.history[ex.id] = {
+        score,
+        correct,
+        wrong,
+        empty,
+        date: new Date().toLocaleDateString("tr-TR")
+      };
+      savePersistedState();
+
+      // Populate Result View
+      const statusBadge = document.getElementById("result-status-badge");
+      if (passed) {
+        statusBadge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300";
+        statusBadge.innerHTML = "<span>🎉</span> <span>BAŞARILI — 50 BARAJ PUANINI GEÇTİNİZ</span>";
+      } else {
+        statusBadge.className = "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-300";
+        statusBadge.innerHTML = "<span>⚠️</span> <span>BAŞARISIZ — 50 BARAJ PUANININ ALTINDA KALDINIZ</span>";
+      }
+
+      document.getElementById("result-exam-title").textContent = ex.title;
+      const timeSpentSec = (45 * 60) - ex.remainingSec;
+      const spentM = Math.max(1, Math.round(timeSpentSec / 60));
+      document.getElementById("result-candidate-line").textContent =
+        `Aday: ${appState.candidateName || "Misafir Aday"} • Tamamlanma Süresi: ~${spentM} dakika • Geçme Barajı: 25 Doğru (50 Puan)`;
+
+      document.getElementById("result-score-big").textContent = String(score);
+      document.getElementById("result-correct-count").textContent = String(correct);
+      document.getElementById("result-wrong-count").textContent = String(wrong);
+      document.getElementById("result-empty-count").textContent = String(empty);
+
+      // Render 9 learning units breakdown
+      const unitGrid = document.getElementById("result-unit-breakdown");
+      unitGrid.innerHTML = "";
+      Object.keys(UNITS).forEach(uKey => {
+        const st = unitStats[uKey];
+        if (!st || st.total === 0) return;
+        const pct = Math.round((st.correct / st.total) * 100);
+        const barColor = pct >= 70 ? "bg-emerald-600" : (pct >= 50 ? "bg-amber-500" : "bg-rose-600");
+        const box = document.createElement("div");
+        box.className = "p-3.5 rounded-xl bg-slate-50 border border-slate-200";
+        box.innerHTML = `
+          <div class="flex items-center justify-between text-xs font-bold text-slate-800 mb-1.5">
+            <span>${UNITS[uKey]}</span>
+            <span class="text-slate-900">${st.correct} / ${st.total} (%${pct})</span>
+          </div>
+          <div class="w-full h-2 rounded-full bg-slate-200 overflow-hidden">
+            <div class="h-full ${barColor}" style="width: ${pct}%"></div>
+          </div>
+        `;
+        unitGrid.appendChild(box);
+      });
+
+      renderReviewList("all");
+      renderDashboard();
+      switchView("result");
+    }
+
+    function renderReviewList(filterMode) {
+      const ex = appState.activeExam;
+      if (!ex) return;
+
+      const btnAll = document.getElementById("filter-review-all");
+      const btnWrong = document.getElementById("filter-review-wrong");
+      if (filterMode === "all") {
+        btnAll.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-700 text-white";
+        btnWrong.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200";
+      } else {
+        btnWrong.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-700 text-white";
+        btnAll.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200";
+      }
+
+      const container = document.getElementById("result-questions-review-list");
+      container.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      ex.questions.forEach((qObj, idx) => {
+        const userAns = ex.answers[idx];
+        const isCorrect = (userAns === qObj.a);
+        if (filterMode === "wrong" && isCorrect) return;
+
+        let statusPill = "";
+        if (userAns === undefined) {
+          statusPill = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-200 text-slate-800">BOŞ BIRAKILDI • Doğru: ${letters[qObj.a]}</span>`;
+        } else if (isCorrect) {
+          statusPill = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">✓ DOĞRU (${letters[qObj.a]})</span>`;
+        } else {
+          statusPill = `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800">✗ YANLIŞ (Sizin Yanıtınız: ${letters[userAns]} • Doğru: ${letters[qObj.a]})</span>`;
+        }
+
+        const item = document.createElement("div");
+        item.className = "p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5";
+
+        const optsHtml = qObj.o.map((optText, oIdx) => {
+          let cls = "bg-white border-slate-200 text-slate-700";
+          if (oIdx === qObj.a) {
+            cls = "bg-emerald-50 border-emerald-500 text-emerald-950 font-bold";
+          } else if (userAns === oIdx && oIdx !== qObj.a) {
+            cls = "bg-rose-50 border-rose-400 text-rose-900 line-through";
+          }
+          return `<div class="p-2.5 rounded-lg border text-xs sm:text-sm ${cls}"><strong>${letters[oIdx]})</strong> ${optText}</div>`;
+        }).join("");
+
+        item.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="text-xs font-bold text-blue-900">Soru ${idx + 1} • ${UNITS[qObj.u]}</div>
+            ${statusPill}
+          </div>
+          <div class="text-sm font-semibold text-slate-900">${qObj.q}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${optsHtml}</div>
+          <div class="p-3 rounded-lg bg-blue-50/80 border border-blue-200 text-xs text-slate-800 leading-relaxed">
+            <strong class="text-blue-900">Açıklamalı Çözüm:</strong> ${qObj.e}
+          </div>
+        `;
+        container.appendChild(item);
+      });
+
+      if (container.children.length === 0) {
+        container.innerHTML = `<div class="p-6 text-center text-sm font-semibold text-emerald-700 bg-emerald-50 rounded-xl">Tebrikler! Hiç yanlış veya boş sorunuz bulunmuyor.</div>`;
+      }
+    }
+
+    // =========================================================================
+    // QUESTION POOL BROWSER (150 QUESTIONS)
+    // =========================================================================
+    function renderPoolBrowser() {
+      const unitVal = parseInt(document.getElementById("pool-unit-filter").value, 10);
+      const query = document.getElementById("pool-search-input").value.trim().toLowerCase();
+      const container = document.getElementById("pool-list-container");
+      container.innerHTML = "";
+      const letters = ["A", "B", "C", "D"];
+
+      const filtered = QUESTION_POOL.filter(qObj => {
+        if (unitVal > 0 && qObj.u !== unitVal) return false;
+        if (query) {
+          const hay = (qObj.q + " " + qObj.o.join(" ") + " " + qObj.e).toLowerCase();
+          return hay.includes(query);
+        }
+        return true;
+      });
+
+      filtered.forEach(qObj => {
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 sm:p-5 rounded-2xl shadow-sm border border-slate-200 space-y-2.5";
+
+        const optsHtml = qObj.o.map((optText, oIdx) => {
+          const isAns = (oIdx === qObj.a);
+          const cls = isAns
+            ? "bg-emerald-50 border-emerald-500 text-emerald-950 font-bold"
+            : "bg-slate-50 border-slate-200 text-slate-700";
+          return `<div class="p-2.5 rounded-lg border text-xs sm:text-sm ${cls}"><strong>${letters[oIdx]})</strong> ${optText} ${isAns ? '✓' : ''}</div>`;
+        }).join("");
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="px-2.5 py-0.5 rounded-md bg-blue-100 text-blue-900 font-extrabold text-xs">Havuz Soru #${qObj.id}</span>
+            <span class="text-xs font-semibold text-slate-500">${UNITS[qObj.u]}</span>
+          </div>
+          <div class="text-sm sm:text-base font-bold text-slate-900">${qObj.q}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">${optsHtml}</div>
+          <div class="p-3 rounded-xl bg-amber-50/70 border border-amber-200 text-xs text-slate-800">
+            <strong class="text-amber-900">Çözüm Notu:</strong> ${qObj.e}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `<div class="bg-white p-8 rounded-2xl text-center text-sm text-slate-500 border border-slate-200">Arama kriterinize uygun soru bulunamadı.</div>`;
+      }
+    }
+
+    // =========================================================================
+    // URL HASH SHARING (Share Platform Link or Share Score Card Link)
+    // =========================================================================
+    function checkUrlHashOnLoad() {
+      const hash = window.location.hash.replace(/^#/, "");
+      if (!hash) return;
+      const params = new URLSearchParams(hash);
+
+      // Check if someone shared a score card link (#share=1&name=...&exam=...&score=...)
+      if (params.get("share") === "1") {
+        const sName = params.get("name") || "Bir Aday";
+        const sExam = params.get("exam") || "deneme-1";
+        const sScore = params.get("score") || "0";
+        const sCorrect = params.get("c") || "0";
+        const sWrong = params.get("w") || "0";
+
+        const examObj = EXAMS_CONFIG.find(e => e.id === sExam);
+        const examTitle = examObj ? examObj.title : "MEB Usta Öğreticilik Deneme Sınavı";
+
+        const banner = document.getElementById("shared-result-banner");
+        document.getElementById("shared-banner-title").textContent =
+          `${sName}, "${examTitle}" sınavından ${sScore} Puan aldı!`;
+        document.getElementById("shared-banner-details").textContent =
+          `Sonuç Detayı: ${sCorrect} Doğru, ${sWrong} Yanlış (${parseInt(sScore, 10) >= 50 ? 'BAŞARILI ✓' : 'Baraj Altı'})`;
+        banner.classList.remove("hidden");
+
+        const tryBtn = document.getElementById("shared-try-same-btn");
+        tryBtn.onclick = () => {
+          banner.classList.add("hidden");
+          startExam(sExam);
+        };
+      } else if (params.get("exam")) {
+        const targetExam = params.get("exam");
+        if (EXAMS_CONFIG.some(e => e.id === targetExam) || targetExam === "deneme-rastgele") {
+          startExam(targetExam);
+        }
+      }
+    }
+
+    // =========================================================================
+    // EVENT LISTENERS INITIALIZATION
+    // =========================================================================
+    window.addEventListener("DOMContentLoaded", () => {
+      loadPersistedState();
+      renderDashboard();
+      renderPoolBrowser();
+      checkUrlHashOnLoad();
+
+      // Top Navbar buttons
+      document.getElementById("nav-btn-home").addEventListener("click", () => {
+        renderDashboard();
+        switchView("home");
+      });
+      document.getElementById("nav-btn-pool").addEventListener("click", () => {
+        renderPoolBrowser();
+        switchView("pool");
+      });
+      document.getElementById("nav-btn-deploy").addEventListener("click", () => {
+        switchView("deploy");
+      });
+
+      // Candidate Name & Instant Feedback Toggle
+      document.getElementById("save-candidate-btn").addEventListener("click", () => {
+        const val = document.getElementById("candidate-name-input").value.trim();
+        appState.candidateName = val;
+        savePersistedState();
+        showToast(val ? `Hoş geldiniz, ${val}! Bilgileriniz kaydedildi.` : "Aday adı güncellendi.");
+      });
+
+      document.getElementById("instant-feedback-toggle").addEventListener("change", (e) => {
+        appState.instantFeedback = e.target.checked;
+        savePersistedState();
+        showToast(appState.instantFeedback ? "Eğitim Modu açıldı: Şıkkı seçtiğiniz anda çözüm gösterilecek." : "Gerçek Sınav Modu aktif: Çözümler sınav sonunda gösterilecek.", "ℹ️");
+      });
+
+      document.getElementById("share-platform-btn").addEventListener("click", () => {
+        const cleanUrl = window.location.href.split("#")[0];
+        copyTextToClipboard(cleanUrl, "Sınav platformu linki kopyalandı! Arkadaşlarınızla paylaşabilirsiniz.");
+      });
+
+      document.getElementById("shared-close-btn").addEventListener("click", () => {
+        document.getElementById("shared-result-banner").classList.add("hidden");
+      });
+
+      document.getElementById("go-pool-from-home-btn").addEventListener("click", () => {
+        renderPoolBrowser();
+        switchView("pool");
+      });
+
+      // Active Exam Controls
+      document.getElementById("prev-question-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (ex && ex.currentIndex > 0) {
+          ex.currentIndex--;
+          renderActiveQuestion();
+          renderPalette();
+        }
+      });
+
+      document.getElementById("next-question-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (!ex) return;
+        if (ex.currentIndex < ex.questions.length - 1) {
+          ex.currentIndex++;
+          renderActiveQuestion();
+          renderPalette();
+        } else {
+          promptFinishExam();
+        }
+      });
+
+      document.getElementById("flag-question-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (!ex) return;
+        const idx = ex.currentIndex;
+        ex.flags[idx] = !ex.flags[idx];
+        renderActiveQuestion();
+        renderPalette();
+      });
+
+      document.getElementById("clear-answer-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (!ex) return;
+        delete ex.answers[ex.currentIndex];
+        renderActiveQuestion();
+        renderPalette();
+      });
+
+      document.getElementById("jump-first-empty-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (!ex) return;
+        for (let i = 0; i < ex.questions.length; i++) {
+          if (ex.answers[i] === undefined) {
+            ex.currentIndex = i;
+            renderActiveQuestion();
+            renderPalette();
+            return;
+          }
+        }
+        showToast("Boş bıraktığınız soru kalmadı! Tüm soruları yanıtladınız.", "🎉");
+      });
+
+      document.getElementById("exam-finish-top-btn").addEventListener("click", promptFinishExam);
+      document.getElementById("exam-finish-side-btn").addEventListener("click", promptFinishExam);
+
+      // Modal Controls
+      document.getElementById("modal-cancel-btn").addEventListener("click", closeConfirmModal);
+      document.getElementById("modal-confirm-btn").addEventListener("click", () => {
+        if (typeof modalConfirmCallback === "function") {
+          modalConfirmCallback();
+        }
+      });
+
+      // Result View Controls
+      document.getElementById("filter-review-all").addEventListener("click", () => renderReviewList("all"));
+      document.getElementById("filter-review-wrong").addEventListener("click", () => renderReviewList("wrong"));
+
+      document.getElementById("retry-current-exam-btn").addEventListener("click", () => {
+        if (appState.activeExam) {
+          startExam(appState.activeExam.id);
+        }
+      });
+
+      document.getElementById("back-to-home-from-result-btn").addEventListener("click", () => {
+        renderDashboard();
+        switchView("home");
+      });
+
+      document.getElementById("share-result-link-btn").addEventListener("click", () => {
+        const ex = appState.activeExam;
+        if (!ex) return;
+        const hist = appState.history[ex.id] || { score: 0, correct: 0, wrong: 0 };
+        const base = window.location.href.split("#")[0];
+        const params = new URLSearchParams({
+          share: "1",
+          name: appState.candidateName || "Aday",
+          exam: ex.id,
+          score: String(hist.score),
+          c: String(hist.correct),
+          w: String(hist.wrong)
+        });
+        const shareUrl = `${base}#${params.toString()}`;
+        copyTextToClipboard(shareUrl, "Sınav sonuç karnesi linkiniz kopyalandı! WhatsApp/Telegram'da paylaşabilirsiniz.");
+      });
+
+      // Pool View Controls
+      document.getElementById("pool-unit-filter").addEventListener("change", renderPoolBrowser);
+      document.getElementById("pool-search-input").addEventListener("input", renderPoolBrowser);
+
+      // Deploy View Controls
+      document.getElementById("back-home-from-deploy-btn").addEventListener("click", () => {
+        switchView("home");
+      });
+
+      // Keyboard navigation during active exam
+      window.addEventListener("keydown", (e) => {
+        const examView = document.getElementById("view-exam");
+        if (!examView || examView.classList.contains("hidden")) return;
+        if (!appState.activeExam) return;
+        if (e.target && (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")) return;
+
+        const key = e.key.toUpperCase();
+        if (key === "A" || key === "1") {
+          appState.activeExam.answers[appState.activeExam.currentIndex] = 0;
+          renderActiveQuestion();
+          renderPalette();
+        } else if (key === "B" || key === "2") {
+          appState.activeExam.answers[appState.activeExam.currentIndex] = 1;
+          renderActiveQuestion();
+          renderPalette();
+        } else if (key === "C" || key === "3") {
+          appState.activeExam.answers[appState.activeExam.currentIndex] = 2;
+          renderActiveQuestion();
+          renderPalette();
+        } else if (key === "D" || key === "4") {
+          appState.activeExam.answers[appState.activeExam.currentIndex] = 3;
+          renderActiveQuestion();
+          renderPalette();
+        } else if (e.key === "ArrowRight") {
+          if (appState.activeExam.currentIndex < appState.activeExam.questions.length - 1) {
+            appState.activeExam.currentIndex++;
+            renderActiveQuestion();
+            renderPalette();
+          }
+        } else if (e.key === "ArrowLeft") {
+          if (appState.activeExam.currentIndex > 0) {
+            appState.activeExam.currentIndex--;
+            renderActiveQuestion();
+            renderPalette();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>
