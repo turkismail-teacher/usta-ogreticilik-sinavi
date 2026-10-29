@@ -80,7 +80,7 @@
         <button id="nav-btn-pool" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold hover:bg-white/15 transition flex items-center gap-1.5">
           <span>📚</span> <span>Soru Havuzu (150)</span>
         </button>
-      
+
       </nav>
     </div>
   </header>
@@ -477,7 +477,7 @@
       </div>
     </section>
 
-   
+
 
   </main>
 
@@ -589,7 +589,7 @@
     }
 
     function switchView(viewName) {
-      const views = ["home", "exam", "result", "pool", "deploy"];
+      const views = ["home", "exam", "result", "pool"];
       views.forEach(v => {
         const el = document.getElementById("view-" + v);
         if (el) {
@@ -1197,9 +1197,7 @@
         renderPoolBrowser();
         switchView("pool");
       });
-      document.getElementById("nav-btn-deploy").addEventListener("click", () => {
-        switchView("deploy");
-      });
+
 
       // Candidate Name & Instant Feedback Toggle
       document.getElementById("save-candidate-btn").addEventListener("click", () => {
@@ -1329,10 +1327,7 @@
       document.getElementById("pool-unit-filter").addEventListener("change", renderPoolBrowser);
       document.getElementById("pool-search-input").addEventListener("input", renderPoolBrowser);
 
-      // Deploy View Controls
-      document.getElementById("back-home-from-deploy-btn").addEventListener("click", () => {
-        switchView("home");
-      });
+
 
       // Keyboard navigation during active exam
       window.addEventListener("keydown", (e) => {
