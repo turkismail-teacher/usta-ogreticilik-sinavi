@@ -80,9 +80,7 @@
         <button id="nav-btn-pool" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold hover:bg-white/15 transition flex items-center gap-1.5">
           <span>📚</span> <span>Soru Havuzu (150)</span>
         </button>
-        <button id="nav-btn-deploy" type="button" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 hover:bg-emerald-500/30 transition flex items-center gap-1.5">
-          <span>🚀</span> <span>Ücretsiz Yayınla &amp; Paylaş</span>
-        </button>
+      
       </nav>
     </div>
   </header>
@@ -479,58 +477,7 @@
       </div>
     </section>
 
-    <!-- ==================== VIEW 5: FREE HOSTING & MULTI-USER DEPLOY GUIDE ==================== -->
-    <section id="view-deploy" class="hidden space-y-6">
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-          <span>🌐</span> <span>%100 Sunucusuz (Static) Mimari • 10 Gün Değil Yıllarca Ücretsiz ve Sorunsuz Çalışır</span>
-        </div>
-        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900">Ücretsiz Hostta Yayınlama ve Çoklu Kullanıcı Paylaşım Rehberi</h2>
-        <p class="text-sm text-slate-600 leading-relaxed">
-          Bu platform <strong>tamamen tek bir HTML dosyası (`index.html`)</strong> içinde çalışacak şekilde tasarlanmıştır. Harici bir veritabanı, PHP/Node.js sunucusu veya ücretli API gerektirmez. Bu sayede 10 gün boyunca (veya istediğiniz kadar süresiz) <strong>aynı anda yüzlerce kişi</strong> linke tıkladığında her kullanıcının sınav süresi, işaretlediği şıklar ve puanları kendi tarayıcısında bağımsız olarak çalışır; kesinlikle çökme veya kota aşımı yaşanmaz.
-        </p>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-            <div class="text-sm font-extrabold text-blue-900">Yöntem 1: Netlify Drop (30 Saniye - Üyelikli/Ücretsiz)</div>
-            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
-              <li>Size sunduğum <strong>ZIP paketini</strong> veya HTML dosyasını bilgisayarınıza indirin.</li>
-              <li><strong>app.netlify.com/drop</strong> adresine gidin.</li>
-              <li>ZIP dosyasını (veya klasörü) sayfadaki kutuya sürükleyip bırakın.</li>
-              <li>Anında size özel <code>https://...netlify.app</code> linki üretilir. Bu linki WhatsApp veya Telegram grubunuzda paylaşabilirsiniz!</li>
-            </ol>
-          </div>
-
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-            <div class="text-sm font-extrabold text-blue-900">Yöntem 2: GitHub Pages (Tamamen Ücretsiz &amp; Kalıcı)</div>
-            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
-              <li>GitHub'da ücretsiz yeni bir <strong>Repository (Depo)</strong> açın.</li>
-              <li>ZIP içindeki <code>index.html</code> dosyasını yükleyin (Upload files).</li>
-              <li><strong>Settings → Pages</strong> sekmesinden Branch olarak <code>main</code> seçip kaydedin.</li>
-              <li>1 dakika içinde <code>kullaniciadi.github.io/sinav</code> linkiniz yayına girer.</li>
-            </ol>
-          </div>
-
-          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-            <div class="text-sm font-extrabold text-blue-900">Yöntem 3: Vercel / Cloudflare Pages / Surge.sh</div>
-            <ol class="text-xs text-slate-700 space-y-1.5 list-decimal pl-4">
-              <li><strong>Cloudflare Pages</strong> veya <strong>Vercel</strong> paneline girip ZIP/klasör yüklemesi yapabilirsiniz.</li>
-              <li>Bant genişliği sınırı olmadan aynı anda binlerce kursiyer telefon, tablet veya bilgisayardan sınav çözebilir.</li>
-              <li>Her aday sınav bitiminde <strong>"Sonuç Karnemi Link Olarak Paylaş"</strong> butonuyla kendi sınav sonucunu eğitmene gönderebilir.</li>
-            </ol>
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3">
-          <div class="text-xs text-slate-600">
-            <strong>Doğrudan Deneme Linki Paylaşımı:</strong> Belirli bir denemeye doğrudan link vermek için URL sonuna <code>#exam=deneme-1</code> ekleyebilirsiniz.
-          </div>
-          <button id="back-home-from-deploy-btn" type="button" class="px-4 py-2 rounded-xl bg-blue-700 text-white font-bold text-xs hover:bg-blue-800 transition">
-            ← Sınav Ekranına Dön
-          </button>
-        </div>
-      </div>
-    </section>
+   
 
   </main>
 
